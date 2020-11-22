@@ -1,0 +1,307 @@
+<?xml version="1.0" ?>
+<%
+  # Based on Gazebo example
+
+  # Vehicle with rigid suspension and front steering
+  # Consists of box chassis with 4 non-steerable wheels
+  # SI units (length in meters)
+
+  # Geometry
+  chassis_dx   = 0.465
+  chassis_dy   = 0.216
+  chassis_dz   = 0.170
+  wheel_radius = 0.050
+  wheel_width  = 0.040
+  chassis_z0   = wheel_radius + chassis_dz / 2.0
+  wheel_x0     = chassis_dx*0.3
+  wheel_y0     = chassis_dy*0.5 + wheel_width*0.6 + 0.010
+  steer_limit  = 75 * Math::PI / 180.0
+  caster_angle =  5 * Math::PI / 180.0
+
+
+  forearm_length = 0.25
+  aftarm_length  = 0.35
+  arm_edge       = 0.05
+  forearm_angle  = 45
+
+  shoulder_radius = 0.03
+  shoulder_height = 0.06
+
+  shoulder_offset = 0.1
+
+
+
+
+  forearm_rad = forearm_angle * Math::PI / 180.0
+  forearm_x   = forearm_length * Math::sin(forearm_rad) * 0.5
+  forearm_y   = forearm_length * Math::cos(forearm_rad) * 0.5
+
+  arm_scales = {
+    "right" => {:y_scale => 1},
+    "left" => {:y_scale => -1},
+  }
+
+  front_wheel_locations = {
+    "fl" => {:x0 => wheel_x0, :y0 => wheel_y0 },
+    "fr" => {:x0 => wheel_x0, :y0 => -wheel_y0 },
+  }
+  rear_wheel_locations = {
+    "rl" => {:x0 => -wheel_x0, :y0 => wheel_y0 },
+    "rr" => {:x0 => -wheel_x0, :y0 => -wheel_y0 },
+  }
+
+  # inertia
+  chassis_mass = 2.0
+  chassis_ixx  = chassis_mass/12.0 * (chassis_dy**2 + chassis_dz**2)
+  chassis_iyy  = chassis_mass/12.0 * (chassis_dz**2 + chassis_dx**2)
+  chassis_izz  = chassis_mass/12.0 * (chassis_dx**2 + chassis_dy**2)
+
+  # chassis c.g. offset from center of box
+  chassis_cgx  = chassis_dx*0.1
+  chassis_cgy  = 0
+  chassis_cgz  = 0
+  wheel_mass   = 0.25
+  wheel_ixx    = wheel_mass * (wheel_radius**2 / 4.0 + wheel_width**2 / 12.0)
+  wheel_iyy    = wheel_mass * (wheel_radius**2 / 4.0 + wheel_width**2 / 12.0)
+  wheel_izz    = wheel_mass/2.0 * wheel_radius**2
+%>
+<sdf version="1.5">
+  <!-- http://sdformat.org/spec?elem=sensor&ver=1.5 -->
+  <model name="tankbot">
+    <link name="chassis">
+      <pose>0 0 <%= chassis_z0 %>  0 0 0</pose>
+      <inertial>
+        <pose><%= chassis_cgx %> <%= chassis_cgy %> <%= chassis_cgz %>  0 0 0</pose>
+        <mass><%= chassis_mass %></mass>
+        <inertia>
+          <ixx><%= chassis_ixx %></ixx>
+          <iyy><%= chassis_iyy %></iyy>
+          <izz><%= chassis_izz %></izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size><%= chassis_dx %> <%= chassis_dy %> <%= chassis_dz %></size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size><%= chassis_dx %> <%= chassis_dy %> <%= chassis_dz %></size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <%
+      arm_scales.keys.each do |k|
+        y_scale = arm_scales[k][:y_scale]
+    %>
+
+    <%= '<link name="' + k + '_aftarm' + '">' %>
+      <inertial>
+        <mass>1</mass>
+        <inertia><ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz></inertia>
+      </inertial>
+      <pose><%= chassis_cgx + shoulder_offset %> <%= chassis_cgy + (y_scale * (chassis_dy/2.0)) %> <%= chassis_z0 %> 0 0 0</pose>
+      <visual name='visual'>
+        <geometry><box><size><%= aftarm_length %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
+        <material>
+          <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Orange</name></script>
+        </material>
+      </visual>
+      <collision name='collision'>
+        <geometry><box><size><%= aftarm_length %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
+      </collision>
+    </link>
+    <%= '<link name="' + k + '_forearm' + '">' %>
+      <inertial>
+        <mass>1</mass>
+        <inertia><ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz></inertia>
+      </inertial>
+      <pose><%= chassis_cgx + shoulder_offset + aftarm_length - forearm_x %>
+        <%= chassis_cgy + (y_scale * (chassis_dy/2.0)) + (-y_scale) * forearm_y%>
+        <%= chassis_z0 %> 0 0 <%= -y_scale * forearm_rad %></pose>
+      <visual name='visual'>
+        <geometry><box><size><%= forearm_length %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
+        <material>
+          <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Orange</name></script>
+        </material>
+      </visual>
+      <collision name='collision'>
+        <geometry><box><size><%= forearm_length %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
+      </collision>
+    </link>
+
+    <%= '<link name="' + k + '_shoulder' + '">' %>
+      <inertial>
+        <mass>1</mass>
+        <inertia><ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz></inertia>
+      </inertial>
+      <pose><%= chassis_cgx + shoulder_offset - aftarm_length/2 %>
+        <%= chassis_cgy + (y_scale * (chassis_dy/2.0)) %>
+        <%= chassis_z0 %> 0 0 <%= -y_scale * forearm_rad %></pose>
+      <visual name='visual'>
+        <geometry><cylinder><radius><%= shoulder_radius %></radius><length><%= shoulder_height %></length></cylinder></geometry>
+        <material>
+          <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script>
+        </material>
+      </visual>
+      <collision name='collision'>
+        <geometry><cylinder><radius><%= shoulder_radius %></radius><length><%= shoulder_height %></length></cylinder></geometry>
+      </collision>
+    </link>
+    <%= '<joint name="' + k + '_elbow_joint" type="fixed">' %>
+      <%= '<parent>' + k + '_aftarm</parent>' %>
+      <%= '<child>' + k + '_forearm</child>' %>
+    </joint>
+    <%= '<joint name="' + k + '_pre_shoulder_joint" type="fixed">' %>
+      <%= '<parent>' + k + '_shoulder</parent>' %>
+      <%= '<child>' + k + '_aftarm</child>' %>
+    </joint>
+    <%= '<joint name="' + k + '_shoulder_joint" type="revolute">' %>
+      <parent>chassis</parent>
+      <%= '<child>' + k + '_shoulder</child>' %>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+    <% end %>
+
+    <%
+      front_wheel_locations.keys.each do |k|
+        x0 = front_wheel_locations[k][:x0]
+        y0 = front_wheel_locations[k][:y0]
+    %>
+    <%= "<link name=" + '"wheel_' + k + '">' %>
+      <pose>
+        <%= x0 %> <%= y0 %> <%= wheel_radius %>
+        <%= -Math::PI/2 %> <%= -caster_angle %> 0
+      </pose>
+      <inertial>
+        <mass><%= wheel_mass %></mass>
+        <inertia>
+          <ixx><%= wheel_ixx %></ixx>
+          <iyy><%= wheel_iyy %></iyy>
+          <izz><%= wheel_izz %></izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+            <radius><%= wheel_radius %></radius>
+            <length><%= wheel_width %></length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius><%= wheel_radius %></radius>
+            <length><%= wheel_width %></length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <%
+      # Steering and wheel spin implemented as universal joint
+      # First axis is steering, has limits
+      # Second axis is spin
+      # Steering axis is inclinded by caster_angle, which is implemented
+      #  by inclining the wheel link frame (see wheel link pose element)
+      %>
+    <%= "<joint name=" + '"wheel_' + k + '_drive" type="revolute">' %>
+      <parent>chassis</parent>
+      <%= "<child>wheel_" + k + "</child>" %>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+    <% end %>
+    <%
+      rear_wheel_locations.keys.each do |k|
+        x0 = rear_wheel_locations[k][:x0]
+        y0 = rear_wheel_locations[k][:y0]
+    %>
+    <%= "<link name=" + '"wheel_' + k + '">' %>
+      <pose>
+       <%= x0 %> <%= y0 %> <%= wheel_radius %>
+       <%= -Math::PI/2 %> 0 0
+      </pose>
+      <inertial>
+        <mass><%= wheel_mass %></mass>
+        <inertia>
+          <ixx><%= wheel_ixx %></ixx>
+          <iyy><%= wheel_iyy %></iyy>
+          <izz><%= wheel_izz %></izz>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+            <radius><%= wheel_radius %></radius>
+            <length><%= wheel_width %></length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius><%= wheel_radius %></radius>
+            <length><%= wheel_width %></length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <%= "<joint name=" + '"wheel_' + k + '_drive" type="revolute">' %>
+      <parent>chassis</parent>
+      <%= "<child>wheel_" + k + "</child>" %>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+    <% end %>
+
+    <include>
+      <uri>model://ultrasonic_sensor</uri>
+      <pose>
+        0.0 0.0 <%= chassis_dz + wheel_radius %>
+        0.0 0.0 0.0
+      </pose>
+    </include>
+
+    <joint name="sonar_joint" type="fixed">
+      <child>ultrasonic_sensor::link</child>
+      <parent>chassis</parent>
+    </joint>
+  </model>
+</sdf>
