@@ -37,8 +37,8 @@
   forearm_y   = forearm_length * Math::cos(forearm_rad) * 0.5
 
   arm_scales = {
-    "right" => {:y_scale => 1},
-    "left" => {:y_scale => -1},
+    "right" => {:y_scale => -1},
+    "left" => {:y_scale => 1},
   }
 
   front_wheel_locations = {
@@ -118,7 +118,7 @@
       <visual name='visual'>
         <geometry><box><size><%= aftarm_length %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
         <material>
-          <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Orange</name></script>
+          <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script>
         </material>
       </visual>
       <collision name='collision'>
@@ -136,7 +136,7 @@
       <visual name='visual'>
         <geometry><box><size><%= forearm_length %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
         <material>
-          <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Orange</name></script>
+          <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Black</name></script>
         </material>
       </visual>
       <collision name='collision'>

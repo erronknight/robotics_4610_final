@@ -18,9 +18,12 @@ public:
     physics::ModelPtr model;
     vector<string> drives_l;
     vector<string> drives_r;
+    vector<string> drives_arm_l;
+    vector<string> drives_arm_r;
 
     transport::NodePtr node;
 
+    transport::SubscriberPtr arm_sub;
     transport::SubscriberPtr vel_sub;
     transport::SubscriberPtr stat_sub;
 
@@ -49,11 +52,40 @@ public:
     }
 
     void
+    SetPos(double angle)
+    {
+        auto jc = model->GetJointController();
+        for (auto name : this->drives_arm_r) {
+            jc->SetPositionTarget(name, -angle);
+            std::cerr << "spgr "
+                      << name
+                      << -angle
+                      << std::endl;
+        }
+        for (auto name : this->drives_arm_l) {
+            jc->SetPositionTarget(name, angle);
+            std::cerr << "spgl "
+                      << name
+                      << angle
+                      << std::endl;
+        }
+    }
+
+    void
     SetVelPID(string name)
     {
         auto pid = common::PID(0.15, 0, 0);
         auto jc = model->GetJointController();
         jc->SetVelocityPID(name, pid);
+
+    }
+
+    void
+    SetPosPID(string name)
+    {
+        auto pid = common::PID(1.0, 0.1, 1.0);
+        auto jc = model->GetJointController();
+        jc->SetPositionPID(name, pid);
 
     }
 
@@ -90,25 +122,39 @@ public:
                 this->SetVelPID(sname);
             }
 
+            if (name == std::string("tankbot::left_shoulder_joint"))
+            {
+                this->drives_arm_l.push_back(sname);
+                this->SetPosPID(sname);
+            }
+
+            if (name == std::string("tankbot::right_shoulder_joint"))
+            {
+                this->drives_arm_r.push_back(sname);
+                this->SetPosPID(sname);
+            }
+
             std::cerr << "joint: " << joint->GetName() << std::endl;
         }
 
         this->SetVel(0.0, 0.0);
 
+        this->SetPos(0);
+
         this->node = transport::NodePtr(new transport::Node());
         this->node->Init(world_name);
 
         string vel_cmd_topic = "~/" + model_name + "/vel_cmd";
-        this->vel_sub = this->node->Subscribe(
-            vel_cmd_topic, &TankControlPlugin::OnVelCmd, this);
-        std::cerr << "Subscribed vel_cmd: "
-                  << this->vel_sub->GetTopic() << std::endl;
+        this->vel_sub = this->node->Subscribe(vel_cmd_topic, &TankControlPlugin::OnVelCmd, this);
+        std::cerr << "Subscribed vel_cmd: " << this->vel_sub->GetTopic() << std::endl;
+
+        string vel_arm_topic = "~/" + model_name + "/arm_cmd";
+        this->arm_sub = this->node->Subscribe(vel_arm_topic, &TankControlPlugin::OnPosCmd, this);
+        std::cerr << "Subscribed arm_cmd: " << this->arm_sub->GetTopic() << std::endl;
 
         string stats_topic = "~/world_stats";
-        this->stat_sub = this->node->Subscribe(
-            stats_topic, &TankControlPlugin::OnStats, this);
-        std::cerr << "Subscribed world_stats: "
-                  << this->stat_sub->GetTopic() << std::endl;
+        this->stat_sub = this->node->Subscribe(stats_topic, &TankControlPlugin::OnStats, this);
+        std::cerr << "Subscribed world_stats: " << this->stat_sub->GetTopic() << std::endl;
 
         string pose_topic = "~/" + model_name + "/pose";
         this->pose_pub = this->node->Advertise<msgs::PoseStamped>(pose_topic, 50);
@@ -129,6 +175,15 @@ public:
         std::cerr << "Got vel cmd: " << lvel << "," << rvel << std::endl;
 
         this->SetVel(lvel, rvel);
+    }
+
+    void
+    OnPosCmd(ConstAnyPtr &msg)
+    {
+        int raw = msg->int_value();
+        double rad_angle = float(raw) / 128.0 - 1.0;
+        std::cerr << "Got pos cmd: " << raw << " " << rad_angle << std::endl;
+        this->SetPos(rad_angle * 3.14159265);
     }
 
     msgs::PoseStamped
