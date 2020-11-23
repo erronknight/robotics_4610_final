@@ -1,0 +1,14 @@
+BIN  := ImportTest
+SRCS := $(wildcard *.cc)
+OBJS := $(SRCS:.c=.o)
+
+$(BIN): $(OBJS)
+	$(CC) -o $@ $(OBJS)
+
+
+%.o : %.c $(wildcard *.h)
+	$(CC) -g -c -o $@ $<
+
+clean:
+	rm -r *.o *.gch
+

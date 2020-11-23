@@ -18,7 +18,7 @@
 //
 // NOTE: If the ball is not found, this returns 666
 // (I would do -1, but that's technically a valid angle).
-float get_direction_of_ball(cv::Mat pic, float current_angle);
+float get_direction_of_ball(cv::Mat pic);
 
 // If the ball is in the camera frame, this will return the distance to get to
 // said ball
