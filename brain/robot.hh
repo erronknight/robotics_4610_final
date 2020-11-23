@@ -29,6 +29,7 @@ class Robot {
 
     void set_vel(double lvel, double rvel);
     void set_arm_ang(double ang);
+    void set_kick_val(double val);
 
     void on_scan(ConstSonarStampedPtr &msg);
     void on_frame(ConstImageStampedPtr &msg);
@@ -38,8 +39,11 @@ class Robot {
     bool task_done;
 
     gazebo::transport::NodePtr node;
+
     gazebo::transport::PublisherPtr vel_pub;
     gazebo::transport::PublisherPtr arm_pub;
+    gazebo::transport::PublisherPtr kick_pub;
+
     gazebo::transport::SubscriberPtr scan_sub;
     gazebo::transport::SubscriberPtr frame_sub;
     gazebo::transport::SubscriberPtr pose_sub;

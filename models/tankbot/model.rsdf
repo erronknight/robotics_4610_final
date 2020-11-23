@@ -29,7 +29,9 @@
 
   shoulder_offset = 0.1
 
-
+  kicker_length = 0.25
+  kicker_radius = 0.03
+  kicker_offset = 0.01
 
 
   forearm_rad = forearm_angle * Math::PI / 180.0
@@ -55,6 +57,11 @@
   chassis_ixx  = chassis_mass/12.0 * (chassis_dy**2 + chassis_dz**2)
   chassis_iyy  = chassis_mass/12.0 * (chassis_dz**2 + chassis_dx**2)
   chassis_izz  = chassis_mass/12.0 * (chassis_dx**2 + chassis_dy**2)
+
+  kicker_mass = 1.0
+  kicker_ixx  = kicker_mass/12.0 * (3 * kicker_radius**2 + kicker_length**2)
+  kicker_iyy  = kicker_mass/12.0 * (3 * kicker_radius**2 + kicker_length**2)
+  kicker_izz  = kicker_mass/2.0 * kicker_radius**2
 
   # chassis c.g. offset from center of box
   chassis_cgx  = chassis_dx*0.1
@@ -103,6 +110,40 @@
         </material>
       </visual>
     </link>
+
+    <link name="kicker">
+      <pose><%= chassis_dx/2.0 - kicker_length/2.0 + kicker_offset %> 0 <%= chassis_z0 %> 0 <%= Math::PI/2%> 0</pose>
+      <inertial>
+        <mass><%= kicker_mass %></mass>
+        <inertia><ixx><%= kicker_ixx %></ixx><iyy><%= kicker_iyy %></iyy><izz><%= kicker_izz %></izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
+      </inertial>
+      <collision name='collision'>
+        <geometry><cylinder><radius><%= kicker_radius %></radius><length><%= kicker_length %></length></cylinder></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><cylinder><radius><%= kicker_radius %></radius><length><%= kicker_length %></length></cylinder></geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <joint name="kicker_joint" type="prismatic">
+      <parent>chassis</parent>
+      <child>kicker</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper> <%= kicker_length - kicker_offset %></upper>
+          <!-- <effort>0.1</effort>
+          <velocity>1000</velocity> -->
+        </limit>
+      </axis>
+    </joint>
 
     <%
       arm_scales.keys.each do |k|

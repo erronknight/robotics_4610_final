@@ -39,6 +39,40 @@
       </visual>
     </link>
 
+    <link name="kicker">
+      <pose>0.11750000000000001 0 0.135 0 1.5707963267948966 0</pose>
+      <inertial>
+        <mass>1.0</mass>
+        <inertia><ixx>0.0054333333333333326</ixx><iyy>0.0054333333333333326</iyy><izz>0.00045</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
+      </inertial>
+      <collision name='collision'>
+        <geometry><cylinder><radius>0.03</radius><length>0.25</length></cylinder></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><cylinder><radius>0.03</radius><length>0.25</length></cylinder></geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <joint name="kicker_joint" type="prismatic">
+      <parent>chassis</parent>
+      <child>kicker</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper> 0.24</upper>
+          <!-- <effort>0.1</effort>
+          <velocity>1000</velocity> -->
+        </limit>
+      </axis>
+    </joint>
+
     
 
     <link name="right_aftarm">
