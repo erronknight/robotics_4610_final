@@ -1,0 +1,5 @@
+*.so
+brain/build/**
+brain/brain
+plugins/tank_control/build/**
+.idea

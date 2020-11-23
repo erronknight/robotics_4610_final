@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="ultrasonic_sensor">
+    <pose>0 0 0.02 0 0 0</pose>
+    <link name="link">
+      
+      <inertial>
+        <mass>0.1</mass>
+      </inertial>
+      
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius>0.04</radius>
+            <length>0.04</length>
+          </cylinder>
+        </geometry>
+      </visual>
+      
+      <collision name="collision-base">
+        <pose>0 0 -0.0145 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 0.05 0.041</size>
+          </box>
+        </geometry>
+      </collision>
+      
+      <collision name="collision-top">
+        <pose>0 0 0.0205 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.021</radius>
+            <length>0.029</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      
+      <sensor name="sonar" type="sonar">
+        <pose>0.04 0 0 0 1.5 3.14</pose>
+        <sonar>
+          <min>0</min>
+          <max>3</max>
+          <radius>0.3</radius>
+        </sonar>
+        <plugin name="sonar" filename="libSonarPlugin.so" />
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <visualize>true</visualize>
+      </sensor>
+      
+    </link>
+  </model>
+</sdf>
