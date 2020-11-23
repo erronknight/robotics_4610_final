@@ -41,6 +41,9 @@ Robot::Robot(int argc, char* argv[], void (*cb)(Robot*))
     arm_pub = node->Advertise<msgs::Any>("~/tankbot0/arm_cmd");
     arm_pub->WaitForConnection();
 
+    kick_pub = node->Advertise<msgs::Any>("~/tankbot0/kick_cmd");
+    kick_pub->WaitForConnection();
+
     scan_sub = node->Subscribe(
         string("~/tankbot0/tankbot/ultrasonic_sensor/link/sonar/sonar"),
         &Robot::on_scan,
@@ -101,12 +104,19 @@ Robot::done()
 }
 
 void
-Robot::set_arm_ang(double ang)
-{
+Robot::set_arm_ang(double ang) {
     auto msg = msgs::ConvertAny(int(ang * 128 + 128));
-//    std::cout << "send " << ang << std::endl;
     this->arm_pub->Publish(msg);
+    cout << " send arm " << ang << endl;
 }
+
+void
+Robot::set_kick_val(double val) {
+    auto msg = msgs::ConvertAny(int(val * 256));
+    this->kick_pub->Publish(msg);
+    cout << " send kick " << val << endl;
+}
+
 
 void
 Robot::set_vel(double lvel, double rvel)

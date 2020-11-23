@@ -22,10 +22,12 @@ using namespace std;
 
 void
 callback(Robot* robot) {
-  robot->set_arm_ang(0.0f); // completely forward
+//  robot->set_arm_ang(0.0f); // completely forward
   // robot->set_arm_ang(0.5f); // t-pose
   // robot->set_arm_ang(1.0f); // backwards
 
+  robot->set_kick_val(1.0f); // completely extended
+  // robot->set_kick_val(0.0f); // stowed
 }
 
 #include <X11/Xlib.h>
