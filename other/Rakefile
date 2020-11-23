@@ -1,0 +1,4 @@
+
+task :default do
+  system("bundle exec ruby mazegen.rb > ../worlds/autogen.world")
+end
