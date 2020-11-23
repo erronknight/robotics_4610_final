@@ -24,7 +24,7 @@ include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
-add_executable(brain brain.cc robot.cc viz.cc)
+add_executable(brain brain_old.cc robot.cc viz.cc)
 TARGET_LINK_LIBRARIES(brain ${GTK3_LIBRARIES})
 target_link_libraries(brain ${GAZEBO_LIBRARIES})
 target_link_libraries(brain ${OpenCV_LIBS})

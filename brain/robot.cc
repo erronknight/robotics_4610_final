@@ -38,6 +38,9 @@ Robot::Robot(int argc, char* argv[], void (*cb)(Robot*))
     vel_pub = node->Advertise<msgs::Any>("~/tankbot0/vel_cmd");
     vel_pub->WaitForConnection();
 
+    arm_pub = node->Advertise<msgs::Any>("~/tankbot0/arm_cmd");
+    arm_pub->WaitForConnection();
+
     scan_sub = node->Subscribe(
         string("~/tankbot0/tankbot/ultrasonic_sensor/link/sonar/sonar"),
         &Robot::on_scan,
@@ -95,6 +98,14 @@ void
 Robot::done()
 {
     this->task_done = true;
+}
+
+void
+Robot::set_arm_ang(double ang)
+{
+    auto msg = msgs::ConvertAny(int(ang * 128 + 128));
+//    std::cout << "send " << ang << std::endl;
+    this->arm_pub->Publish(msg);
 }
 
 void
