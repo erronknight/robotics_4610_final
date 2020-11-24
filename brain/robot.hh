@@ -1,14 +1,14 @@
 #ifndef ROBOT_HH
 #define ROBOT_HH
 
-
 #include <string.h>
+
+#include <opencv2/core/mat.hpp>
+
 #include <gazebo/gazebo_config.h>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/gazebo_client.hh>
-
-#include <opencv2/core/mat.hpp>
 
 double clamp(double, double, double);
 

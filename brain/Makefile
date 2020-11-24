@@ -1,5 +1,5 @@
 
-BIN := brain
+BIN := kickerbot goaliebot
 
 all: $(BIN)
 
@@ -9,7 +9,7 @@ build/Makefile: Makefile CMakeLists.txt
 
 $(BIN): $(wildcard *.cc) build/Makefile
 	(cd build && make)
-	cp build/$(BIN) .
+	(cd build && cp $(BIN) ..)
 
 clean:
 	rm -rf build $(BIN)
