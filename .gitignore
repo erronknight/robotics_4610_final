@@ -3,3 +3,6 @@ brain/build/**
 brain/brain
 plugins/tank_control/build/**
 .idea
+
+# Our build tooling
+objdir.*/

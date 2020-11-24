@@ -14,6 +14,8 @@
 
 #include <mutex>
 
+#include <tasklib.h>
+
 /* Surface to store current scribbles */
 std::mutex mx2;
 

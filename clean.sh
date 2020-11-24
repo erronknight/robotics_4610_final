@@ -10,7 +10,7 @@ fi
 
 comp=$1
 
-if [ "$comp" = "--all" ]; then
+if [ -z "$comp" ] || [ "$comp" = "--all" ]; then
 
 	# Add more components as necessary.
 	$action kickerbot

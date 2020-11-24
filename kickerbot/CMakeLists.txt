@@ -23,6 +23,9 @@ find_package(gazebo REQUIRED)
 include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
+# Common lib
+include_directories(../common)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 add_executable(kickerbot brain.cc robot.cc viz.cc)
 TARGET_LINK_LIBRARIES(kickerbot ${GTK3_LIBRARIES})
