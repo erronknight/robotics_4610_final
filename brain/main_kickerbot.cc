@@ -10,6 +10,10 @@
 #include <mutex>
 
 #include "robot.hh"
+
+#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui.hpp"
+
 #include "common.hxx"
 #include "tasklib.hxx"
 
