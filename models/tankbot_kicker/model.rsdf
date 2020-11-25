@@ -394,8 +394,8 @@
       </pose>
     </include>
 
-    <joint name="camera_joint" type="fixed">
-      <child>camera_sensor::link</child>
+    <joint name="sonar_joint" type="fixed">
+      <child>ultrasonic_sensor::link</child>
       <parent>chassis</parent>
     </joint>
 
