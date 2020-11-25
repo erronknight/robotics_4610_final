@@ -8,6 +8,7 @@
 #include "robot.hh"
 #include "common.hxx"
 #include "tasklib.hxx"
+#include "taskrt.hxx"
 
 using namespace cv;
 using namespace std;
