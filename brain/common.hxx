@@ -164,13 +164,6 @@ struct aistate {
     // Adds a task like above, but also includes a comment.
     void queue_task(RoboTask* task, std::string comment);
 
-    // TODO Remove this, replace with more sophisticated world tracking system.
-    std::vector<float> hdg_samples;
-
-    void add_heading_sample(float ang);
-    float calc_avg_heading();
-    void clear_heading_samples();
-
     aistate();
 
 };

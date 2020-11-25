@@ -116,18 +116,6 @@ void aistate::queue_task(RoboTask* task, std::string comment) {
     fresh_tasks.push_back(te);
 }
 
-void aistate::add_heading_sample(float ang) {
-    hdg_samples.push_back(ang);
-}
-
-float aistate::calc_avg_heading() {
-    return angle_avg(hdg_samples.data(), hdg_samples.size());
-}
-
-void aistate::clear_heading_samples() {
-    hdg_samples.clear();
-}
-
 std::string statenamev[] = {
     "NEW",
     "ACTIVE",
