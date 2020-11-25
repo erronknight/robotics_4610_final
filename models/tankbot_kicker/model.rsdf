@@ -19,8 +19,8 @@
   caster_angle =  5 * Math::PI / 180.0
 
 
-  forearm_length = 0.25
-  aftarm_length  = 0.35
+  forearm_len = 0.25
+  aftarm_len  = 0.35
   arm_edge       = 0.05
   forearm_angle  = 45
 
@@ -29,16 +29,18 @@
 
   shoulder_offset = 0.1
 
-
+  kicker_len = 0.25
+  kicker_radius = 0.03
+  kicker_offset = 0.01
 
 
   forearm_rad = forearm_angle * Math::PI / 180.0
-  forearm_x   = forearm_length * Math::sin(forearm_rad) * 0.5
-  forearm_y   = forearm_length * Math::cos(forearm_rad) * 0.5
+  forearm_x   = forearm_len * Math::cos(forearm_rad) * 0.5
+  forearm_y   = forearm_len * Math::sin(forearm_rad) * 0.5
 
   arm_scales = {
-    "right" => {:y_scale => 1},
-    "left" => {:y_scale => -1},
+    "right" => {:y_scale => -1},
+    "left" => {:y_scale => 1},
   }
 
   front_wheel_locations = {
@@ -56,6 +58,26 @@
   chassis_iyy  = chassis_mass/12.0 * (chassis_dz**2 + chassis_dx**2)
   chassis_izz  = chassis_mass/12.0 * (chassis_dx**2 + chassis_dy**2)
 
+  kicker_mass = 0.5
+  kicker_ixx  = kicker_mass/12.0 * (3 * kicker_radius**2 + kicker_len**2)
+  kicker_iyy  = kicker_mass/12.0 * (3 * kicker_radius**2 + kicker_len**2)
+  kicker_izz  = kicker_mass/2.0 * kicker_radius**2
+
+  shoulder_mass = 0.1
+  shoulder_ixx  = shoulder_mass/12.0 * (3 * shoulder_radius**2 + shoulder_height**2)
+  shoulder_iyy  = shoulder_mass/12.0 * (3 * shoulder_radius**2 + shoulder_height**2)
+  shoulder_izz  = shoulder_mass/2.0 * shoulder_radius**2
+
+  forearm_mass = 0.5
+  forearm_ixx  = forearm_mass/12.0 * (arm_edge**2 + arm_edge**2)
+  forearm_iyy  = forearm_mass/12.0 * (arm_edge**2 + forearm_len**2)
+  forearm_izz  = forearm_mass/12.0 * (forearm_len**2 + arm_edge**2)
+
+  aftarm_mass = 0.5
+  aftarm_ixx  = aftarm_mass/12.0 * (arm_edge**2 + arm_edge**2)
+  aftarm_iyy  = aftarm_mass/12.0 * (arm_edge**2 + aftarm_len**2)
+  aftarm_izz  = aftarm_mass/12.0 * (aftarm_len**2 + arm_edge**2)
+
   # chassis c.g. offset from center of box
   chassis_cgx  = chassis_dx*0.1
   chassis_cgy  = 0
@@ -69,19 +91,17 @@
   <!-- http://sdformat.org/spec?elem=sensor&ver=1.5 -->
   <model name="tankbot">
     <link name="chassis">
-      <pose>0 0 <%= chassis_z0 %>  0 0 0</pose>
+      <pose>0 0 <%= chassis_z0 %> 0 0 0</pose>
+
       <inertial>
         <pose><%= chassis_cgx %> <%= chassis_cgy %> <%= chassis_cgz %>  0 0 0</pose>
         <mass><%= chassis_mass %></mass>
         <inertia>
-          <ixx><%= chassis_ixx %></ixx>
-          <iyy><%= chassis_iyy %></iyy>
-          <izz><%= chassis_izz %></izz>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyz>0</iyz>
+          <ixx><%= chassis_ixx %></ixx><iyy><%= chassis_iyy %></iyy><izz><%= chassis_izz %></izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
         </inertia>
       </inertial>
+
       <collision name="collision">
         <geometry>
           <box>
@@ -89,6 +109,7 @@
           </box>
         </geometry>
       </collision>
+
       <visual name="visual">
         <geometry>
           <box>
@@ -104,72 +125,143 @@
       </visual>
     </link>
 
+    <link name="kicker">
+      <pose>
+        <%= chassis_dx/2.0 - kicker_len/2.0 + kicker_offset %> 0 <%= chassis_z0 %>
+        0 <%= Math::PI/2%> 0
+      </pose>
+      <inertial>
+        <mass><%= kicker_mass %></mass>
+        <inertia>
+          <ixx><%= kicker_ixx %></ixx><iyy><%= kicker_iyy %></iyy><izz><%= kicker_izz %></izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
+      </inertial>
+
+      <collision name='collision'>
+        <geometry><cylinder><radius><%= kicker_radius %></radius><length><%= kicker_len %></length></cylinder></geometry>
+      </collision>
+
+      <visual name="visual">
+        <geometry><cylinder><radius><%= kicker_radius %></radius><length><%= kicker_len %></length></cylinder></geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <joint name="kicker_joint" type="prismatic">
+      <parent>chassis</parent>
+      <child>kicker</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper> <%= kicker_len - kicker_offset %></upper>
+          <!-- <effort>0.1</effort>
+          <velocity>1000</velocity> -->
+        </limit>
+      </axis>
+    </joint>
+
     <%
       arm_scales.keys.each do |k|
         y_scale = arm_scales[k][:y_scale]
     %>
 
     <%= '<link name="' + k + '_aftarm' + '">' %>
+      <pose>
+        <%= chassis_cgx + shoulder_offset %>
+        <%= chassis_cgy + (y_scale * (chassis_dy/2.0)) %>
+        <%= chassis_z0 %> 0 0 0
+      </pose>
+
       <inertial>
-        <mass>1</mass>
-        <inertia><ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz></inertia>
+        <mass><%= aftarm_mass %></mass>
+        <inertia>
+          <ixx><%= aftarm_ixx %></ixx><iyy><%= aftarm_iyy %></iyy><izz><%= aftarm_izz %></izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
       </inertial>
-      <pose><%= chassis_cgx + shoulder_offset %> <%= chassis_cgy + (y_scale * (chassis_dy/2.0)) %> <%= chassis_z0 %> 0 0 0</pose>
+
       <visual name='visual'>
-        <geometry><box><size><%= aftarm_length %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
+        <geometry><box><size><%= aftarm_len %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
         <material>
-          <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Orange</name></script>
+          <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script>
         </material>
       </visual>
+
       <collision name='collision'>
-        <geometry><box><size><%= aftarm_length %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
+        <geometry><box><size><%= aftarm_len %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
       </collision>
     </link>
+
     <%= '<link name="' + k + '_forearm' + '">' %>
-      <inertial>
-        <mass>1</mass>
-        <inertia><ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz></inertia>
-      </inertial>
-      <pose><%= chassis_cgx + shoulder_offset + aftarm_length - forearm_x %>
+      <pose>
+        <%= chassis_cgx + shoulder_offset + aftarm_len - forearm_x %>
         <%= chassis_cgy + (y_scale * (chassis_dy/2.0)) + (-y_scale) * forearm_y%>
-        <%= chassis_z0 %> 0 0 <%= -y_scale * forearm_rad %></pose>
+        <%= chassis_z0 %> 0 0 <%= -y_scale * forearm_rad %>
+      </pose>
+
+      <inertial>
+        <mass><%= forearm_mass %></mass>
+        <inertia>
+          <ixx><%= forearm_ixx %></ixx><iyy><%= forearm_iyy %></iyy><izz><%= forearm_izz %></izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+
       <visual name='visual'>
-        <geometry><box><size><%= forearm_length %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
+        <geometry><box><size><%= forearm_len %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
         <material>
-          <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Orange</name></script>
+          <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Black</name></script>
         </material>
       </visual>
+
       <collision name='collision'>
-        <geometry><box><size><%= forearm_length %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
+        <geometry><box><size><%= forearm_len %> <%= arm_edge %> <%= arm_edge %></size></box></geometry>
       </collision>
     </link>
 
     <%= '<link name="' + k + '_shoulder' + '">' %>
-      <inertial>
-        <mass>1</mass>
-        <inertia><ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz></inertia>
-      </inertial>
-      <pose><%= chassis_cgx + shoulder_offset - aftarm_length/2 %>
+      <pose>
+        <%= chassis_cgx + shoulder_offset - aftarm_len/2 %>
         <%= chassis_cgy + (y_scale * (chassis_dy/2.0)) %>
-        <%= chassis_z0 %> 0 0 <%= -y_scale * forearm_rad %></pose>
+        <%= chassis_z0 %> 0 0 <%= -y_scale * forearm_rad %>
+      </pose>
+
+      <inertial>
+        <mass><%= shoulder_mass %></mass>
+        <inertia>
+          <ixx><%= shoulder_ixx %></ixx><iyy><%= shoulder_iyy %></iyy><izz><%= shoulder_izz %></izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+
       <visual name='visual'>
         <geometry><cylinder><radius><%= shoulder_radius %></radius><length><%= shoulder_height %></length></cylinder></geometry>
         <material>
           <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script>
         </material>
       </visual>
+
       <collision name='collision'>
         <geometry><cylinder><radius><%= shoulder_radius %></radius><length><%= shoulder_height %></length></cylinder></geometry>
       </collision>
     </link>
+
     <%= '<joint name="' + k + '_elbow_joint" type="fixed">' %>
       <%= '<parent>' + k + '_aftarm</parent>' %>
       <%= '<child>' + k + '_forearm</child>' %>
     </joint>
+
     <%= '<joint name="' + k + '_pre_shoulder_joint" type="fixed">' %>
       <%= '<parent>' + k + '_shoulder</parent>' %>
       <%= '<child>' + k + '_aftarm</child>' %>
     </joint>
+
     <%= '<joint name="' + k + '_shoulder_joint" type="revolute">' %>
       <parent>chassis</parent>
       <%= '<child>' + k + '_shoulder</child>' %>
@@ -177,7 +269,10 @@
         <xyz>0 0 1</xyz>
       </axis>
     </joint>
+
     <% end %>
+
+
 
     <%
       front_wheel_locations.keys.each do |k|
@@ -301,6 +396,19 @@
 
     <joint name="sonar_joint" type="fixed">
       <child>ultrasonic_sensor::link</child>
+      <parent>chassis</parent>
+    </joint>
+
+    <include>
+      <uri>model://camera_sensor</uri>
+      <pose>
+        0.2 0.0 0.3
+        0.0 0.0 0.0
+      </pose>
+    </include>
+
+    <joint name="camera_joint" type="fixed">
+      <child>camera_sensor::link</child>
       <parent>chassis</parent>
     </joint>
   </model>

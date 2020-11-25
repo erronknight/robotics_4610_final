@@ -1,5 +1,10 @@
 *.so
 brain/build/**
-brain/brain
 plugins/tank_control/build/**
 .idea
+
+# Emacs
+*~
+
+# Our bot programs end in "bot"
+*bot
