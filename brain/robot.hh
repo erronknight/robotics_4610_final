@@ -1,6 +1,8 @@
 #ifndef ROBOT_HH
 #define ROBOT_HH
 
+
+#include <string.h>
 #include <gazebo/gazebo_config.h>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
@@ -20,7 +22,7 @@ class Robot {
     float pos_t;
     cv::Mat frame;
 
-    Robot(int argc, char* argv[], void (*cb)(Robot*));
+    Robot(int argc, char* argv[], void (*cb)(Robot*), std::string name);
     ~Robot();
 
     bool at_goal();

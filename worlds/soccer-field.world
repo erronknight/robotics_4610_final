@@ -25,7 +25,7 @@
     </include>
 
     <model name='soccer_ball'>
-      <pose>0 0 0 0 0 0</pose>
+      <pose>10 0 0 0 0 0</pose>
       <static>0</static>
       <link name='link'>
         <collision name='collision'>
@@ -59,10 +59,20 @@
 
     <!-- A testing model that includes the Velodyne sensor model -->
     <model name="tankbot0">
-      <pose>-20 0 0 0 0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
 
       <include>
-        <uri>model://tankbot</uri>
+        <uri>model://tankbot_kicker</uri>
+      </include>
+
+      <plugin name="tankbot_control" filename="libtank_control_plugin.so"/>
+    </model>
+
+    <model name="tankbot1">
+      <pose>5 0 0 0 0 0</pose>
+
+      <include>
+        <uri>model://tankbot_goalie</uri>
       </include>
 
       <plugin name="tankbot_control" filename="libtank_control_plugin.so"/>
