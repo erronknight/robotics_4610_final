@@ -1,20 +1,14 @@
 
 #include <iostream>
-#include <thread>
 #include <math.h>
 #include <vector>
-#include <deque>
 #include <chrono>
 #include <cmath>
 #include <string>
-#include <mutex>
 
 #include "robot.hh"
 #include "common.hxx"
 #include "tasklib.hxx"
-
-/* Surface to store current scribbles */
-std::mutex mx2;
 
 using namespace cv;
 using namespace std;
