@@ -99,17 +99,6 @@ int signf2i(float v, float dz) {
     return 0;
 }
 
-DistSamples::DistSamples(Robot* robo) {
-/*    // These indexes are always stable.
-    brt_dist = robo->ranges[0].range;
-    right_dist = robo->ranges[1].range;
-    frt_dist = robo->ranges[2].range;
-    fwd_dist = robo->ranges[3].range;
-    flt_dist = robo->ranges[4].range;
-    left_dist = robo->ranges[5].range;
-    blt_dist = robo->ranges[6].range;*/
-}
-
 bool aistate::has_pending_tasks() {
     return task_stack.size() > 0 || fresh_tasks.size() > 0;;
 }

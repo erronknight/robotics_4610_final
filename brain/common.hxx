@@ -91,31 +91,14 @@ float clampf(float v, float n, float x);
  */
 int signf2i(float v, float dz);
 
-struct DistSamples {
-    float brt_dist;
-    float right_dist;
-    float frt_dist;
-    float fwd_dist;
-    float flt_dist;
-    float left_dist;
-    float blt_dist;
+extern std::string statenamev[3];
 
-    DistSamples(Robot*);
-};
+class RoboTask;
+struct aistate;
 
 #define TSTATE_NEW 0
 #define TSTATE_ACTIVE 1
 #define TSTATE_DONE 2
-
-extern std::string statenamev[3];
-
-#define TSTATUS_DONE 0
-#define TSTATUS_CONTINUE -1
-#define TSTATUS_ABORT -2
-#define TSTATUS_INTERRUPT -3
-
-class RoboTask;
-struct aistate;
 
 struct TaskEntry {
     // 0 = new, 1 = active, 2 = done
@@ -126,6 +109,11 @@ struct TaskEntry {
     TaskEntry(RoboTask*);
     ~TaskEntry();
 };
+
+#define TSTATUS_DONE 0
+#define TSTATUS_CONTINUE -1
+#define TSTATUS_ABORT -2
+#define TSTATUS_INTERRUPT -3
 
 class RoboTask {
 public:

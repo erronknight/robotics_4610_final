@@ -1,3 +1,5 @@
+project(robobrain)
+
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 # Find Gtk+3

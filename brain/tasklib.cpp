@@ -106,6 +106,7 @@ std::string TaskTurnTo::name() {
     return "TURN_TO";
 }
 
+/*
 class DebugPrintPosTask : public RoboTask {
 public:
     int poll(Robot* robo) override {
@@ -114,7 +115,6 @@ public:
     }
 };
 
-/*
 class DebugPrintLidarTask : public RoboTask {
 public:
     int poll(Robot* robo) override {
@@ -271,7 +271,7 @@ int TaskMoveTowards::poll(Robot* robo) {
 
     // This is for we interrupted and want to exit now.
     case 10:
-        return TSTATUS_DONE;
+    return TSTATUS_DONE;
 
     }
 
@@ -280,8 +280,9 @@ int TaskMoveTowards::poll(Robot* robo) {
 }
 
 std::string TaskMoveTowards::name() {
-    // TODO Add the current target to this.
-    return "MOVE";
+    std::string buf = "MOVE(";
+    buf << target_pos.x << ", " << target_pos.y << ")";
+    return buf;
 }
 
 void TaskMoveTowards::update_target(Vec2i new_tgt) {
@@ -295,8 +296,8 @@ void print_stack_trace(aistate* state) {
             << te->task->name() << "@" << te->task->step
             << " " << statenamev[te->state];
 
-        if (te->comment != NULL) {
-            cout << " (" << *te->comment << ")";
+	if (te->comment != NULL) {
+	    cout << " (" << *te->comment << ")";
         }
 
         cout << endl;
@@ -334,7 +335,7 @@ void do_poll_tasks(Robot* robo, aistate* state) {
     }
 
     if (added_tasks > 0) {
-        cout << "[added " << added_tasks << " fresh tasks to stack]" << endl;
+	cout << "[added " << added_tasks << " fresh tasks to stack]" << endl;
     }
 
     TaskEntry* cur_task = state->task_stack.back();
@@ -342,7 +343,7 @@ void do_poll_tasks(Robot* robo, aistate* state) {
     // First we want to poll_inactive all the other tasks first.
     bool interrupted = false;
     for (size_t i = 0; i < state->task_stack.size() - 1 && !interrupted; i++) {
-        TaskEntry* at = state->task_stack[i];
+	TaskEntry* at = state->task_stack[i];
 
         // Don't poll_inactive tasks that haven't been inited yet or have exited.
         if (at->state != TSTATE_ACTIVE) {
@@ -388,7 +389,8 @@ void do_poll_tasks(Robot* robo, aistate* state) {
         }
     }
 
-    // Activate the task if we haven't already.
+    // Activate the task if we haven't already.  If we're coming from an
+    // interrupt then this will never be true.
     if (cur_task->state == TSTATE_NEW) {
         cout << "[initing task " << cur_task->task->name() << "]";
         if (cur_task->comment != NULL) cout << " (" << *cur_task->comment << ")";
@@ -414,7 +416,7 @@ void do_poll_tasks(Robot* robo, aistate* state) {
             if (cur_task->comment != NULL) cout << " (" << *cur_task->comment << ")";
             cout << endl;
 
-            print_stack_trace(state); // TODO Remove.
+            //print_stack_trace(state); // TODO Remove.
             state->task_stack.pop_back();
 
             delete cur_task->task;
