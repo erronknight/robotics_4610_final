@@ -4,19 +4,17 @@
   <!-- http://sdformat.org/spec?elem=sensor&ver=1.5 -->
   <model name="tankbot">
     <link name="chassis">
-      <pose>0 0 0.135  0 0 0</pose>
+      <pose>0 0 0.135 0 0 0</pose>
+
       <inertial>
         <pose>0.04650000000000001 0 0  0 0 0</pose>
         <mass>2.0</mass>
         <inertia>
-          <ixx>0.012592666666666665</ixx>
-          <iyy>0.04085416666666667</iyy>
-          <izz>0.043813500000000005</izz>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyz>0</iyz>
+          <ixx>0.012592666666666665</ixx><iyy>0.04085416666666667</iyy><izz>0.043813500000000005</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
         </inertia>
       </inertial>
+
       <collision name="collision">
         <geometry>
           <box>
@@ -24,6 +22,7 @@
           </box>
         </geometry>
       </collision>
+
       <visual name="visual">
         <geometry>
           <box>
@@ -40,14 +39,21 @@
     </link>
 
     <link name="kicker">
-      <pose>0.11750000000000001 0 0.135 0 1.5707963267948966 0</pose>
+      <pose>
+        0.11750000000000001 0 0.135
+        0 1.5707963267948966 0
+      </pose>
       <inertial>
-        <mass>1.0</mass>
-        <inertia><ixx>0.0054333333333333326</ixx><iyy>0.0054333333333333326</iyy><izz>0.00045</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.0027166666666666663</ixx><iyy>0.0027166666666666663</iyy><izz>0.000225</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
       </inertial>
+
       <collision name='collision'>
         <geometry><cylinder><radius>0.03</radius><length>0.25</length></cylinder></geometry>
       </collision>
+
       <visual name="visual">
         <geometry><cylinder><radius>0.03</radius><length>0.25</length></cylinder></geometry>
         <material>
@@ -76,66 +82,96 @@
     
 
     <link name="right_aftarm">
+      <pose>
+        0.14650000000000002
+        -0.108
+        0.135 0 0 0
+      </pose>
+
       <inertial>
-        <mass>1</mass>
-        <inertia><ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz></inertia>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.00020833333333333337</ixx><iyy>0.005208333333333332</iyy><izz>0.005208333333333332</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
       </inertial>
-      <pose>0.14650000000000002 -0.108 0.135 0 0 0</pose>
+
       <visual name='visual'>
         <geometry><box><size>0.35 0.05 0.05</size></box></geometry>
         <material>
           <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script>
         </material>
       </visual>
+
       <collision name='collision'>
         <geometry><box><size>0.35 0.05 0.05</size></box></geometry>
       </collision>
     </link>
+
     <link name="right_forearm">
+      <pose>
+        0.40811165235168156
+        -0.019611652351681566
+        0.135 0 0 0.7853981633974483
+      </pose>
+
       <inertial>
-        <mass>1</mass>
-        <inertia><ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz></inertia>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.00020833333333333337</ixx><iyy>0.0027083333333333334</iyy><izz>0.0027083333333333334</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
       </inertial>
-      <pose>0.40811165235168156
-        -0.019611652351681552
-        0.135 0 0 0.7853981633974483</pose>
+
       <visual name='visual'>
         <geometry><box><size>0.25 0.05 0.05</size></box></geometry>
         <material>
           <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Black</name></script>
         </material>
       </visual>
+
       <collision name='collision'>
         <geometry><box><size>0.25 0.05 0.05</size></box></geometry>
       </collision>
     </link>
 
     <link name="right_shoulder">
-      <inertial>
-        <mass>1</mass>
-        <inertia><ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz></inertia>
-      </inertial>
-      <pose>-0.02849999999999997
+      <pose>
+        -0.02849999999999997
         -0.108
-        0.135 0 0 0.7853981633974483</pose>
+        0.135 0 0 0.7853981633974483
+      </pose>
+
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>5.25e-05</ixx><iyy>5.25e-05</iyy><izz>4.5e-05</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+
       <visual name='visual'>
         <geometry><cylinder><radius>0.03</radius><length>0.06</length></cylinder></geometry>
         <material>
           <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script>
         </material>
       </visual>
+
       <collision name='collision'>
         <geometry><cylinder><radius>0.03</radius><length>0.06</length></cylinder></geometry>
       </collision>
     </link>
+
     <joint name="right_elbow_joint" type="fixed">
       <parent>right_aftarm</parent>
       <child>right_forearm</child>
     </joint>
+
     <joint name="right_pre_shoulder_joint" type="fixed">
       <parent>right_shoulder</parent>
       <child>right_aftarm</child>
     </joint>
+
     <joint name="right_shoulder_joint" type="revolute">
       <parent>chassis</parent>
       <child>right_shoulder</child>
@@ -143,69 +179,100 @@
         <xyz>0 0 1</xyz>
       </axis>
     </joint>
+
     
 
     <link name="left_aftarm">
+      <pose>
+        0.14650000000000002
+        0.108
+        0.135 0 0 0
+      </pose>
+
       <inertial>
-        <mass>1</mass>
-        <inertia><ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz></inertia>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.00020833333333333337</ixx><iyy>0.005208333333333332</iyy><izz>0.005208333333333332</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
       </inertial>
-      <pose>0.14650000000000002 0.108 0.135 0 0 0</pose>
+
       <visual name='visual'>
         <geometry><box><size>0.35 0.05 0.05</size></box></geometry>
         <material>
           <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Grey</name></script>
         </material>
       </visual>
+
       <collision name='collision'>
         <geometry><box><size>0.35 0.05 0.05</size></box></geometry>
       </collision>
     </link>
+
     <link name="left_forearm">
+      <pose>
+        0.40811165235168156
+        0.019611652351681566
+        0.135 0 0 -0.7853981633974483
+      </pose>
+
       <inertial>
-        <mass>1</mass>
-        <inertia><ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz></inertia>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.00020833333333333337</ixx><iyy>0.0027083333333333334</iyy><izz>0.0027083333333333334</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
       </inertial>
-      <pose>0.40811165235168156
-        0.019611652351681552
-        0.135 0 0 -0.7853981633974483</pose>
+
       <visual name='visual'>
         <geometry><box><size>0.25 0.05 0.05</size></box></geometry>
         <material>
           <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Black</name></script>
         </material>
       </visual>
+
       <collision name='collision'>
         <geometry><box><size>0.25 0.05 0.05</size></box></geometry>
       </collision>
     </link>
 
     <link name="left_shoulder">
-      <inertial>
-        <mass>1</mass>
-        <inertia><ixx>0.166667</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.166667</iyy><iyz>0</iyz><izz>0.166667</izz></inertia>
-      </inertial>
-      <pose>-0.02849999999999997
+      <pose>
+        -0.02849999999999997
         0.108
-        0.135 0 0 -0.7853981633974483</pose>
+        0.135 0 0 -0.7853981633974483
+      </pose>
+
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>5.25e-05</ixx><iyy>5.25e-05</iyy><izz>4.5e-05</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+
       <visual name='visual'>
         <geometry><cylinder><radius>0.03</radius><length>0.06</length></cylinder></geometry>
         <material>
           <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script>
         </material>
       </visual>
+
       <collision name='collision'>
         <geometry><cylinder><radius>0.03</radius><length>0.06</length></cylinder></geometry>
       </collision>
     </link>
+
     <joint name="left_elbow_joint" type="fixed">
       <parent>left_aftarm</parent>
       <child>left_forearm</child>
     </joint>
+
     <joint name="left_pre_shoulder_joint" type="fixed">
       <parent>left_shoulder</parent>
       <child>left_aftarm</child>
     </joint>
+
     <joint name="left_shoulder_joint" type="revolute">
       <parent>chassis</parent>
       <child>left_shoulder</child>
@@ -213,7 +280,10 @@
         <xyz>0 0 1</xyz>
       </axis>
     </joint>
+
     
+
+
 
     
     <link name="wheel_fl">
@@ -416,8 +486,21 @@
       </pose>
     </include>
 
-    <joint name="sonar_joint" type="fixed">
-      <child>ultrasonic_sensor::link</child>
+    <joint name="camera_joint" type="fixed">
+      <child>camera_sensor::link</child>
+      <parent>chassis</parent>
+    </joint>
+
+    <include>
+      <uri>model://camera_sensor</uri>
+      <pose>
+        0.2 0.0 0.3
+        0.0 0.0 0.0
+      </pose>
+    </include>
+
+    <joint name="camera_joint" type="fixed">
+      <child>camera_sensor::link</child>
       <parent>chassis</parent>
     </joint>
   </model>
