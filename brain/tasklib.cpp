@@ -280,8 +280,8 @@ int TaskMoveTowards::poll(Robot* robo) {
 }
 
 std::string TaskMoveTowards::name() {
-    std::string buf = "MOVE(";
-    buf << target_pos.x << ", " << target_pos.y << ")";
+    std::string buf = "MOVE";
+    //buf << target_pos.x << ", " << target_pos.y << ")";
     return buf;
 }
 

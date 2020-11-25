@@ -10,10 +10,6 @@
 #include <mutex>
 
 #include "robot.hh"
-
-#include "opencv2/imgproc.hpp"
-#include "opencv2/highgui.hpp"
-
 #include "common.hxx"
 #include "tasklib.hxx"
 
@@ -34,7 +30,7 @@ public:
 	// robot->set_arm_ang(0.0f); // completely forward
 	// robot->set_arm_ang(0.5f); // t-pose
 	// robot->set_arm_ang(1.0f); // backwards
-	robot->set_kick_val(1.0f); // completely extended
+	robo->set_kick_val(1.0f); // completely extended
 	// robot->set_kick_val(0.0f); // stowed
 	return TSTATUS_CONTINUE;
     }

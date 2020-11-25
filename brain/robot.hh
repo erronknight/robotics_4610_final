@@ -8,9 +8,9 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/gazebo_client.hh>
 
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
 #include <opencv2/core/mat.hpp>
-//#include "opencv2/imgproc.hpp"
-//#include "opencv2/highgui.hpp"
 
 double clamp(double, double, double);
 

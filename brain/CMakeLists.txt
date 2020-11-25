@@ -26,7 +26,7 @@ include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
-add_executable(kickerbot main_kickerbot.cc robot.cc viz.cc common.cpp tasklib.cpp)
+add_executable(kickerbot main_kickerbot.cc robot.cc common.cpp tasklib.cpp)
 target_link_libraries(kickerbot ${GTK3_LIBRARIES})
 target_link_libraries(kickerbot ${GAZEBO_LIBRARIES})
 target_link_libraries(kickerbot ${OpenCV_LIBS})
