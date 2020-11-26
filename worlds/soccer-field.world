@@ -11,17 +11,17 @@
       <uri>model://ground_plane</uri>
     </include>
 
+<!--    <include>-->
+<!--      <uri>model://brick_box_3x1x3</uri>-->
+<!--      <name>wall0</name>-->
+<!--      <pose>-22 -18 -2.0 0 0 1.5707963267948966</pose>-->
+<!--    </include>-->
+
     <!-- The Goal -->
     <include>
       <uri>model://checkerboard_plane</uri>
       <name>goal</name>
-      <pose>20 0 0.01 0 0 0</pose>
-    </include>
-
-    <include>
-      <uri>model://checkerboard_plane</uri>
-      <name>goal</name>
-      <pose>20 0 0.01 0 0 0</pose>
+      <pose>6 0 0.01 0 0 0</pose>
     </include>
 
     <model name='soccer_ball'>
@@ -59,10 +59,20 @@
 
     <!-- A testing model that includes the Velodyne sensor model -->
     <model name="tankbot0">
-      <pose>-20 0 0 0 0 0</pose>
+      <pose>-5 0 0 0 0 0</pose>
 
       <include>
-        <uri>model://tankbot</uri>
+        <uri>model://tankbot_kicker</uri>
+      </include>
+
+      <plugin name="tankbot_control" filename="libtank_control_plugin.so"/>
+    </model>
+
+    <model name="tankbot1">
+      <pose>5 0 0 0 0 1.5707963267948966</pose>
+
+      <include>
+        <uri>model://tankbot_goalie</uri>
       </include>
 
       <plugin name="tankbot_control" filename="libtank_control_plugin.so"/>

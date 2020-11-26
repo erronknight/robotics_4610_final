@@ -2,10 +2,10 @@
 #include <string>
 #include <vector>
 
-#include "opencv2/core/utility.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/highgui.hpp"
+#include <opencv2/core/utility.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
 
 #include "robot.hh"
 
@@ -28,32 +28,38 @@ clamp(double xmin, double xx, double xmax)
     return xx;
 }
 
-Robot::Robot(int argc, char* argv[], void (*cb)(Robot*))
+Robot::Robot(int argc, char* argv[], void (*cb)(Robot*), std::string name)
     : on_update(cb), task_done(false)
 {
     client::setup(argc, argv);
     node = NodePtr(new Node());
     node->Init();
 
-    vel_pub = node->Advertise<msgs::Any>("~/tankbot0/vel_cmd");
+    vel_pub = node->Advertise<msgs::Any>("~/" + name + "/vel_cmd");
     vel_pub->WaitForConnection();
 
+    arm_pub = node->Advertise<msgs::Any>("~/" + name + "/arm_cmd");
+    arm_pub->WaitForConnection();
+
+    kick_pub = node->Advertise<msgs::Any>("~/" + name + "/kick_cmd");
+    kick_pub->WaitForConnection();
+
     scan_sub = node->Subscribe(
-        string("~/tankbot0/tankbot/ultrasonic_sensor/link/sonar/sonar"),
+        string("~/" + name + "/tankbot/ultrasonic_sensor/link/sonar/sonar"),
         &Robot::on_scan,
         this,
         false
     );
 
     frame_sub = node->Subscribe(
-        string("~/tankbot0/tankbot/camera_sensor/link/camera/image"),
+        string("~/" + name + "/tankbot/camera_sensor/link/camera/image"),
         &Robot::on_frame,
         this,
         false
     );
 
     pose_sub = node->Subscribe(
-        string("~/tankbot0/pose"),
+        string("~/" + name + "/pose"),
         &Robot::on_pose,
         this,
         false
@@ -96,6 +102,21 @@ Robot::done()
 {
     this->task_done = true;
 }
+
+void
+Robot::set_arm_ang(double ang) {
+    auto msg = msgs::ConvertAny(int(ang * 128 + 128));
+    this->arm_pub->Publish(msg);
+    cout << " send arm " << ang << endl;
+}
+
+void
+Robot::set_kick_val(double val) {
+    auto msg = msgs::ConvertAny(int(val * 256));
+    this->kick_pub->Publish(msg);
+    cout << " send kick " << val << endl;
+}
+
 
 void
 Robot::set_vel(double lvel, double rvel)

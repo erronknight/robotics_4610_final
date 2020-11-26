@@ -1,11 +1,15 @@
 #ifndef ROBOT_HH
 #define ROBOT_HH
 
+#include <string.h>
+
 #include <gazebo/gazebo_config.h>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/gazebo_client.hh>
 
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
 #include <opencv2/core/mat.hpp>
 
 double clamp(double, double, double);
@@ -20,7 +24,7 @@ class Robot {
     float pos_t;
     cv::Mat frame;
 
-    Robot(int argc, char* argv[], void (*cb)(Robot*));
+    Robot(int argc, char* argv[], void (*cb)(Robot*), std::string name);
     ~Robot();
 
     bool at_goal();
@@ -28,6 +32,8 @@ class Robot {
     void done();
 
     void set_vel(double lvel, double rvel);
+    void set_arm_ang(double ang);
+    void set_kick_val(double val);
 
     void on_scan(ConstSonarStampedPtr &msg);
     void on_frame(ConstImageStampedPtr &msg);
@@ -37,7 +43,11 @@ class Robot {
     bool task_done;
 
     gazebo::transport::NodePtr node;
+
     gazebo::transport::PublisherPtr vel_pub;
+    gazebo::transport::PublisherPtr arm_pub;
+    gazebo::transport::PublisherPtr kick_pub;
+
     gazebo::transport::SubscriberPtr scan_sub;
     gazebo::transport::SubscriberPtr frame_sub;
     gazebo::transport::SubscriberPtr pose_sub;
