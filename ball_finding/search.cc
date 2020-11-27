@@ -21,10 +21,11 @@
 
 #define fov             1.3962634   // Field of View    TODO
 
-#define ball_r          0xFF        // Yellow Ball!     TODO
-#define ball_g          0xFF
-#define ball_b          0x00
-#define color_tolerance 0x08        // +/- color tolerance
+#define ball_hue        32          // Orange ball!
+// #define ball_r          0xFF        // Yellow Ball!     TODO
+// #define ball_g          0xFF
+// #define ball_b          0x00
+#define color_tolerance 8           // +/- color tolerance
 
 #define ball_d          1           // Diameter of the ball (in meters) TODO
 
@@ -44,7 +45,7 @@ float _diff(float deg1, float deg2);
 // CV helpers
 cv::Mat _make_ball_mask(cv::Mat pic);
 int _get_column_of_ball(cv::Mat pic);
-int _ball_pixel_height(int column_index, cv::Mat pic, bool using_mask);
+int _ball_pixel_height(int column_index, cv::Mat pic);
 float _get_visual_angle(int pixel_height, cv::Mat pic);
 
 
@@ -90,7 +91,7 @@ float get_distance_from_ball(cv::Mat pic) {
     }
 
     // Check column for height of pixels of ball
-    int ball_pix = _ball_pixel_height(column, ball_mask, true);
+    int ball_pix = _ball_pixel_height(column, ball_mask);
 
     // With height of ball in pixels, find visual angle
     float visual_angle = _get_visual_angle(ball_pix, pic);
@@ -162,18 +163,14 @@ float _diff(float ang_1, float ang_2) {
 
 
 // Makes a mask of the picture that picks out the ball specifically
-// NOTE: If this mask looks like ass, you can try using HSV instead of BGR and seeing
-// if that helps!
+// Uses HSV to pick out the orange 
 cv::Mat _make_ball_mask(cv::Mat pic) {
     cv::Mat frame = pic;
-
-    // NOTE: DEFAULTS TO BGR, NOT RGB
-    cv::Scalar low = cv::Scalar(clamp(0, ball_b - color_tolerance, 255),
-                        clamp(0, ball_g - color_tolerance, 255),
-                        clamp(0, ball_r - color_tolerance, 255));
-    cv::Scalar high = cv::Scalar(clamp(0, ball_b + color_tolerance, 255),
-                        clamp(0, ball_g + color_tolerance, 255),
-                        clamp(0, ball_r + color_tolerance, 255));
+    cv::Mat frame_hsv;
+    cv::cvtColor(frame, frame_hsv, cv::COLOR_BGR2HSV);
+    
+    cv::Scalar low = cv::Scalar(clamp(0, ball_hue - color_tolerance, 255), 128, 128);
+    cv::Scalar high = cv::Scalar(clamp(0, ball_hue + color_tolerance, 255), 255, 255);
 
     // Creates a black and white mask of the image filtered by the ball color in
     // accordance to the above scalar tolerances
@@ -206,26 +203,29 @@ int _get_column_of_ball(cv::Mat pic) {
 
 
 // Given the index of the column where the ball is in the pic, 
-int _ball_pixel_height(int column_index, cv::Mat pic, bool using_mask) {
+int _ball_pixel_height(int column_index, cv::Mat pic) {
+
+
     int ball_pix = 0;
     for (int row = 0; row < pic.rows; row++) {
         cv::Vec3b color = pic.at<cv::Vec3b>(cv::Point(column_index, row));
 
-        // Can find the ball pixel height with just color but this might not be practical
-        if (!using_mask) {
-            // NOTE: COLOR IS IN BGR
-            if (clamp(0, abs(color.val[0] - ball_b), 255) < color_tolerance
-                && clamp(0, abs(color.val[0] - ball_g), 255) < color_tolerance
-                && clamp(0, abs(color.val[0] - ball_r), 255) < color_tolerance) {
-                    ball_pix++;
-            }
-        }
+        // // Can find the ball pixel height with just color but this might not be practical
+        // if (!using_mask) {
+    
+        //     // NOTE: COLOR IS IN BGR
+        //     if (clamp(0, abs(color.val[0] - ball_b), 255) < color_tolerance
+        //         && clamp(0, abs(color.val[0] - ball_g), 255) < color_tolerance
+        //         && clamp(0, abs(color.val[0] - ball_r), 255) < color_tolerance) {
+        //             ball_pix++;
+        //     }
+        // }
         // I'm like pretty sure this is how the masked version would work?
-        else {
-            if (color.val[0] && color.val[1] && color.val[2]) {
-                    ball_pix++;
-            }
+        // else {
+        if (color.val[0] && color.val[1] && color.val[2]) {
+                ball_pix++;
         }
+        // }
     }
     return ball_pix;
 }
