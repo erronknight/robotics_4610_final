@@ -2,6 +2,8 @@
 brain/build/**
 plugins/tank_control/build/**
 .idea
+ball_finding/build
+ball_finding/ImportTest
 
 # Emacs
 *~
