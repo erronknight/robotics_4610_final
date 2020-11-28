@@ -27,11 +27,14 @@
   shoulder_radius = 0.03
   shoulder_height = 0.06
 
-  shoulder_offset = 0.1
+  shoulder_offset = chassis_dy/2 + 0.05
 
   kicker_len = 0.25
   kicker_radius = 0.03
   kicker_offset = 0.01
+  damping_val = 1
+  joint_friction = 1
+  kicker_force_limit = 50
 
 
   forearm_rad = forearm_angle * Math::PI / 180.0
@@ -68,12 +71,12 @@
   shoulder_iyy  = shoulder_mass/12.0 * (3 * shoulder_radius**2 + shoulder_height**2)
   shoulder_izz  = shoulder_mass/2.0 * shoulder_radius**2
 
-  forearm_mass = 0.5
+  forearm_mass = 0.1
   forearm_ixx  = forearm_mass/12.0 * (arm_edge**2 + arm_edge**2)
   forearm_iyy  = forearm_mass/12.0 * (arm_edge**2 + forearm_len**2)
   forearm_izz  = forearm_mass/12.0 * (forearm_len**2 + arm_edge**2)
 
-  aftarm_mass = 0.5
+  aftarm_mass = 0.1
   aftarm_ixx  = aftarm_mass/12.0 * (arm_edge**2 + arm_edge**2)
   aftarm_iyy  = aftarm_mass/12.0 * (arm_edge**2 + aftarm_len**2)
   aftarm_izz  = aftarm_mass/12.0 * (aftarm_len**2 + arm_edge**2)
@@ -160,9 +163,13 @@
         <limit>
           <lower>0</lower>
           <upper> <%= kicker_len - kicker_offset %></upper>
-          <!-- <effort>0.1</effort>
-          <velocity>1000</velocity> -->
+          <effort><%= kicker_force_limit %></effort>
+          <!--<velocity>1000</velocity> -->
         </limit>
+        <dynamics>
+          <friction><%= joint_friction %></friction>
+          <damping><%= damping_val %></damping>
+        </dynamics>
       </axis>
     </joint>
 
@@ -267,6 +274,11 @@
       <%= '<child>' + k + '_shoulder</child>' %>
       <axis>
         <xyz>0 0 1</xyz>
+        <dynamics>
+          <damping>
+            <%= damping_val %>
+          </damping>
+        </dynamics>
       </axis>
     </joint>
 
@@ -389,7 +401,7 @@
     <include>
       <uri>model://ultrasonic_sensor</uri>
       <pose>
-        0.0 0.0 <%= chassis_dz + wheel_radius %>
+        0.0 0.0 <%= chassis_dz + wheel_radius + (wheel_width / 2) %>
         0.0 0.0 0.0
       </pose>
     </include>

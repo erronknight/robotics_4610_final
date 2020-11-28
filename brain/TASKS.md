@@ -75,7 +75,8 @@ public:
     int poll_inactive(Robot* robo) override;
     int poll(Robot* robo) override;
     std::string name() override;
-    void update_target(Vec2i new_tgt);
+    void update_target(Vec2i* new_tgt);
+    void update_target(Vec2f* new_tgt);
 };
 ```
 

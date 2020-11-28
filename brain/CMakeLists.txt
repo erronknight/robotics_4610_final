@@ -10,6 +10,11 @@ INCLUDE_DIRECTORIES(${GTK3_INCLUDE_DIRS})
 LINK_DIRECTORIES(${GTK3_LIBRARY_DIRS})
 ADD_DEFINITIONS(${GTK3_CFLAGS_OTHER})
 
+# Xlib
+find_package(X11 REQUIRED)
+link_libraries(${X11_LIBRARIES})
+include_directories(${X11_INCLUDE_DIR})
+
 # OpenCV
 find_package(OpenCV REQUIRED)
 include_directories(${OPENCV_INCLUDE_DIRS})

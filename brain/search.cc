@@ -6,6 +6,7 @@
 /////////////
 #include "search.hh"
 #include "robot.hh"
+#include <iostream>
 
 ////////////
 // MACROS //
@@ -13,24 +14,6 @@
 
 // Clamps between 2 values
 #define clamp(min, x, max) (((x) < (min)) ? (min) : (((x) > (max)) ? (max) : (x)))
-
-
-////////////////////////////////////////////
-// CONSTANTS (please validate with model) //
-////////////////////////////////////////////
-
-#define fov             1.3962634   // Field of View    TODO
-
-#define ball_hue        32          // Orange ball!
-// #define ball_r          0xFF        // Yellow Ball!     TODO
-// #define ball_g          0xFF
-// #define ball_b          0x00
-#define color_tolerance 8           // +/- color tolerance
-
-#define ball_d          1           // Diameter of the ball (in meters) TODO
-
-#define turn_speed      1.5         // Wheel speed for self-rotation
-
 
 //////////////////////
 // ADDITIONAL STUBS //
@@ -49,19 +32,33 @@ int _ball_pixel_height(int column_index, cv::Mat pic);
 float _get_visual_angle(int pixel_height, cv::Mat pic);
 
 
+
 //////////////////////////////
 // INTERFACE IMPLEMENTATION //
 //////////////////////////////
 
 // Finds the direction of the ball relative to the current angle
 float get_direction_of_ball(cv::Mat pic) {
-
+    if (pic.empty()){
+        std::cout << "IMAGE IS NULL" << std::endl;
+        return 666.0;
+    }
+  
     // Gets a mask of the image filtering the ball
-    cv::Mat ball_mask = _make_ball_mask(pic); 
+    cv::Mat ball_mask = _make_ball_mask(pic);
+    
+    
+    
     
     // Finds the location of the topmost pixel of the ball (which should also be the center)
     int column = _get_column_of_ball(ball_mask);
-
+    
+    if (DEBUG) {
+        cv::imshow("raw", pic);
+        cv::imshow("filter", ball_mask);
+        cv::waitKey(1);
+    }
+    
     // Returns a sentinel if the ball is not in frame
     if (column < 0) {
         return 666.0;
@@ -69,18 +66,19 @@ float get_direction_of_ball(cv::Mat pic) {
 
     // Finds the angle of this column
     int pic_width = pic.cols;
-    float proportion = static_cast<float>(column - (pic_width / 2.0))
-                        / static_cast<float>(pic_width / 2.0);
+    float proportion = static_cast<float>(column - (pic_width / 2.0)) / static_cast<float>(pic_width / 2.0);
     float direction = proportion * (fov / 2.0);
     return direction;
 }
-
+float get_direction_of_ball(Robot* robot) {
+    return get_direction_of_ball(robot->frame);
+}
 
 // Finds the distance a ball is away given the current picture
 float get_distance_from_ball(cv::Mat pic) {
     
     // Gets a mask of the image filtering the ball
-    cv::Mat ball_mask = _make_ball_mask(pic); 
+    cv::Mat ball_mask = _make_ball_mask(pic);
     
     // Finds the location of the topmost pixel of the ball (which should also be the center)
     int column = _get_column_of_ball(ball_mask);
@@ -103,6 +101,9 @@ float get_distance_from_ball(cv::Mat pic) {
     return distance;
 }
 
+float get_distance_from_ball(Robot* robot) {
+    return get_distance_from_ball(robot->frame);
+}
 
 // Turns the robot and returns true if the ball is in the camera frame
 // TODO: PLEASE CHECK THE ROBOT MODEL
@@ -124,12 +125,13 @@ bool search_for_ball(Robot* robot) {
 
 // Aligns to the ball when it's in the camera frame
 // TODO: PLEASE CHECK THE ROBOT MODEL
-bool turn_to_ball(Robot* robot) {
+bool turn_to_ball(Robot* robot, float tolerance) {
     cv::Mat pic = robot->frame;
+    
     float angle = get_direction_of_ball(pic);
 
     // You are facing the ball!
-    if (_approx_equal(angle, 0, 0.1)) {
+    if (_approx_equal(angle, 0, tolerance)) {
         robot->set_vel(0.0f, 0.0f);
         return true;
     }
@@ -138,7 +140,7 @@ bool turn_to_ball(Robot* robot) {
     float spd = clamp(1.0f, 1.0f + 3.0f * angle, 2.0f);
 
     // Further turning towards the ball!
-    (angle < 0) ? robot->set_vel(spd, -spd) : robot->set_vel(-spd, spd);
+    (angle < 0) ? robot->set_vel(-spd, spd) : robot->set_vel(spd, -spd);
     return false;
 }
 
@@ -163,20 +165,25 @@ float _diff(float ang_1, float ang_2) {
 
 
 // Makes a mask of the picture that picks out the ball specifically
-// Uses HSV to pick out the orange 
+// Uses HSV to pick out the orange
 cv::Mat _make_ball_mask(cv::Mat pic) {
     cv::Mat frame = pic;
     cv::Mat frame_hsv;
+    
+    if (pic.empty()) {
+      return pic;
+    }
+    
     cv::cvtColor(frame, frame_hsv, cv::COLOR_BGR2HSV);
     
-    cv::Scalar low = cv::Scalar(clamp(0, ball_hue - color_tolerance, 255), 128, 128);
-    cv::Scalar high = cv::Scalar(clamp(0, ball_hue + color_tolerance, 255), 255, 255);
+    cv::Scalar low = cv::Scalar(clamp(0, ball_hue - color_tolerance, 180), 128, 50);
+    cv::Scalar high = cv::Scalar(clamp(0, ball_hue + color_tolerance, 180), 255, 255);
 
     // Creates a black and white mask of the image filtered by the ball color in
     // accordance to the above scalar tolerances
     cv::Mat mask;
-    cv::inRange(frame, low, high, mask);
-
+    cv::inRange(frame_hsv, low, high, mask);
+    
     return mask;
     
 }
@@ -184,20 +191,44 @@ cv::Mat _make_ball_mask(cv::Mat pic) {
 // Returns the column within the picture that indersects the middle of the ball.
 // Returns -1 if there is no mask in frame (i.e. all black)
 int _get_column_of_ball(cv::Mat pic) {
-
+    float col_tot = 0;
+    float row_tot = 0;
+    float count = 0;
+    
     // Becasue the object is a circle, the highest up row that has a pixel will subsequently
     // contain the pixel that will be roughly in the direct center of the ball, and can
     // be assumed as the middle
-    for (int row = 0; row < pic.rows; row++) {
-        for (int column = 0; column < pic.cols; column++) {
-            cv::Vec3b color = pic.at<cv::Vec3b>(cv::Point(column, row));
-
+    for (int row = image_search_edge; row < pic.rows - image_search_edge; row++) {
+        uchar* ptr2 = pic.ptr<uchar>(row);
+        for (int column = image_search_edge; column < pic.cols - image_search_edge; column++) {
             // Found the first highest-up pixel of the mask
-            if (color.val[0] && color.val[1] && color.val[2]) {
-                return column;
+            if (ptr2[column]) {
+                col_tot += column;
+                row_tot += row;
+                count += 1;
             }
         }
     }
+    
+    int col_out = std::floor(col_tot / count);
+    int row_out = std::floor(row_tot / count);
+    
+    if (DEBUG) {
+        for (int i = 0; i < pic.rows; i++) {
+            uchar *ptr = pic.ptr<uchar>(i);
+            ptr[col_out] = 128;
+        }
+        
+        uchar *ptr = pic.ptr<uchar>(row_out);
+        for (int j = 0; j < pic.cols; j++) {
+            ptr[j] = 64;
+        }
+    }
+    
+    if (count > ball_pixel_threshold) {
+        return col_out;
+    }
+    
     return -1;
 }
 

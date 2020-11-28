@@ -1,5 +1,6 @@
 #include "common.hxx"
 #include "tasklib.hxx"
+#include <iostream>
 
 void print_ad_test(float f, float t) {
     float diff = angle_diff(f, t);
@@ -81,7 +82,7 @@ TaskTurnTo::TaskTurnTo(float th, float okt) {
 int TaskTurnTo::poll(Robot* robo) {
     float hdg_off = angle_diff(robo->pos_t, target_hdg);
     if (step % 10 == 0) {
-        cout << "current heading = " << robo->pos_t << " off = " << hdg_off << endl;
+//        cout << "current heading = " << robo->pos_t << " off = " << hdg_off << endl;
     }
     step++;
 
@@ -156,7 +157,7 @@ int TaskGo::poll(Robot* robo) {
 
     float hdg_off = angle_diff(robo->pos_t, target_hdg);
     float pidres = pidloop->calculate(0, hdg_off);
-    cout << "off = " << hdg_off << ", pidres = " << pidres << endl;
+//    cout << "off = " << hdg_off << ", pidres = " << pidres << endl;
 
     lasttime = now;
     robo->set_vel(base_vel + pidres, base_vel - pidres);
@@ -196,6 +197,13 @@ std::string TaskGoDur::name() {
 }
 
 TaskMoveTowards::TaskMoveTowards(Vec2i start_tgt, float vel, float dist) {
+    target_pos = Vec2f(start_tgt.x, start_tgt.y);
+    base_vel = vel;
+    end_dist = dist;
+    move_delegate = NULL;
+}
+
+TaskMoveTowards::TaskMoveTowards(Vec2f start_tgt, float vel, float dist) {
     target_pos = start_tgt;
     base_vel = vel;
     end_dist = dist;
@@ -203,21 +211,26 @@ TaskMoveTowards::TaskMoveTowards(Vec2i start_tgt, float vel, float dist) {
 }
 
 // Absolutely terrible use of a macro.
-#define calc_target_heading(robo, tgt) \
-    float dx = tgt.x - robo->pos_x; \
-    float dy = tgt.y - robo->pos_y; \
-    float tgt_hdg = atan2(dy, dx);
+void
+calc_target_heading(Vec2f origin, Vec2f tgt, float &dx, float &dy, float &tgt_hdg) {
+    dx = tgt.x - origin.x;
+    dy = tgt.y - origin.y;
+    tgt_hdg = atan2(dy, dx);
+}
 
 int TaskMoveTowards::poll_inactive(Robot* robo) {
-
+    
+    float tgt_hdg = 0, dx = 0, dy = 0;
     // See macro above.
-    calc_target_heading(robo, target_pos);
+    calc_target_heading(Vec2f(robo->pos_x, robo->pos_y), target_pos, dx, dy, tgt_hdg);
+    
     float dt = angle_diff(robo->pos_t, tgt_hdg);
-    cout << "dx = " << dx << " dy = " << dy << " theta = " << tgt_hdg << " dt = " << dt << endl;
-
+    //cout << "dx = " << dx << " dy = " << dy << " theta = " << tgt_hdg << " dt = " << dt << endl;
+    
     // Check if we're close enough.
     if (dx * dx + dy * dy < end_dist * end_dist && end_dist > 0) {
         step = 10;
+        
         return TSTATUS_INTERRUPT;
     }
 
@@ -240,9 +253,11 @@ int TaskMoveTowards::poll_inactive(Robot* robo) {
 }
 
 int TaskMoveTowards::poll(Robot* robo) {
-
+    
+    float tgt_hdg, dx, dy;
     // See macro above.
-    calc_target_heading(robo, target_pos);
+    calc_target_heading(Vec2f(robo->pos_x, robo->pos_y), target_pos, dx, dy, tgt_hdg);
+    
 
     // Check if we're cloe enough.
     if (dx * dx + dy * dy < end_dist * end_dist && end_dist > 0) {
@@ -280,11 +295,15 @@ int TaskMoveTowards::poll(Robot* robo) {
 }
 
 std::string TaskMoveTowards::name() {
-    std::string buf = "MOVE";
-    //buf << target_pos.x << ", " << target_pos.y << ")";
+    std::string buf = "MOVE (";
+    buf.append(std::to_string(target_pos.x)).append(", ").append(std::to_string(target_pos.y)).append(")");
     return buf;
 }
 
 void TaskMoveTowards::update_target(Vec2i new_tgt) {
+    target_pos = Vec2f(new_tgt.x, new_tgt.y);
+}
+
+void TaskMoveTowards::update_target(Vec2f new_tgt) {
     target_pos = new_tgt;
 }

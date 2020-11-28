@@ -41,7 +41,7 @@ public:
 };
 
 struct Vec2f {
-    int x, y;
+    float x, y;
 
 public:
     Vec2f();
@@ -51,6 +51,10 @@ public:
 
     bool operator==(const Vec2f& rhs) const {
         return x == rhs.x && y == rhs.y;
+    }
+    
+    Vec2f operator +(const Vec2f& rhs) const {
+        return Vec2f(x + rhs.x, y + rhs.y);
     }
 };
 

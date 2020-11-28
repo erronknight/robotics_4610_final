@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.5">
+  <!-- http://sdformat.org/spec?elem=sensor&ver=1.5 -->
+  <model name='soccer_ball'>
+    <link name='link'>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.0016000000000000005</ixx><iyy>0.0016000000000000005</iyy><izz>0.0016000000000000005</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name='collision'>
+        <geometry><sphere><radius>0.2</radius></sphere></geometry>
+        <surface>
+          <friction>
+            <ode> <mu>100</mu> <mu2>100</mu2> </ode>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0.85</restitution_coefficient>
+            <threshold>0</threshold>
+
+          </bounce>
+        </surface>
+<!--          <max_contacts>10</max_contacts>-->
+      </collision>
+      <visual name='visual'>
+        <geometry><sphere><radius>0.2</radius></sphere></geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Orange</name>
+          </script>
+        </material>
+      </visual>
+      <velocity_decay>
+        <linear>0.0004</linear>
+        <angular>0.0004</angular>
+      </velocity_decay>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+    </link>
+  </model>
+</sdf>

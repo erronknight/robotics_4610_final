@@ -24,38 +24,11 @@
       <pose>6 0 0.01 0 0 0</pose>
     </include>
 
-    <model name='soccer_ball'>
+    <include>
+      <uri>model://soccer_ball</uri>
+      <name>soccer_ball</name>
       <pose>0 0 0 0 0 0</pose>
-      <static>0</static>
-      <link name='link'>
-        <collision name='collision'>
-          <geometry><sphere><radius>0.25</radius></sphere></geometry>
-          <surface>
-            <friction>
-              <ode> <mu>100</mu> <mu2>100</mu2> </ode>
-            </friction>
-            <bounce/>
-          </surface>
-<!--          <max_contacts>10</max_contacts>-->
-        </collision>
-        <visual name='visual'>
-          <geometry><sphere><radius>0.25</radius></sphere></geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Orange</name>
-            </script>
-          </material>
-        </visual>
-        <velocity_decay>
-          <linear>0</linear>
-          <angular>0</angular>
-        </velocity_decay>
-        <self_collide>0</self_collide>
-        <kinematic>0</kinematic>
-        <gravity>1</gravity>
-      </link>
-    </model>
+    </include>
 
     <!-- A testing model that includes the Velodyne sensor model -->
     <model name="tankbot0">
@@ -80,4 +53,3 @@
 
   </world>
 </sdf>
-
