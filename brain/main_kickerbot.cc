@@ -18,8 +18,8 @@ using namespace std;
 
 aistate *robot_state;
 
-#define turn_speed      1.5
-#define drive_speed     2.5
+float turn_speed = 3.5;
+float drive_speed = 4.5;
 
 bool collected = false;
 

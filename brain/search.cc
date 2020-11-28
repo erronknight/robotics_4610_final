@@ -15,6 +15,22 @@
 // Clamps between 2 values
 #define clamp(min, x, max) (((x) < (min)) ? (min) : (((x) > (max)) ? (max) : (x)))
 
+////////////////////////////////////////////
+// CONSTANTS (please validate with model) //
+////////////////////////////////////////////
+
+#define fov                   1.3962634 // Field of View    TODO
+
+#define ball_hue              32/2      // Orange ball!
+#define color_tolerance       8/2       // +/- color tolerance
+
+#define ball_d                1         // Diameter of the ball (in meters) TODO
+
+#define turn_speed            3.5       // Wheel speed for self-rotation
+#define ball_pixel_threshold  5
+#define image_search_edge     10
+#define DEBUG                 false
+
 //////////////////////
 // ADDITIONAL STUBS //
 //////////////////////
@@ -137,7 +153,7 @@ bool turn_to_ball(Robot* robot, float tolerance) {
     }
 
     // Sort of smooths it so you don't massively overshoot
-    float spd = clamp(1.0f, 1.0f + 3.0f * angle, 2.0f);
+    float spd = clamp(1.5f, 1.0f + 3.0f * angle, 4.5f);
 
     // Further turning towards the ball!
     (angle < 0) ? robot->set_vel(-spd, spd) : robot->set_vel(spd, -spd);

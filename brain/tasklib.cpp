@@ -91,7 +91,7 @@ int TaskTurnTo::poll(Robot* robo) {
         return TSTATUS_DONE;
     }
 
-    float right_speed = 1.5; // left is this times -1.
+    float right_speed = 3.5; // left is this times -1.
 
     // If we're close then slow down.
     if (abs(hdg_off) < ok_thresh * 2) right_speed = 0.7;

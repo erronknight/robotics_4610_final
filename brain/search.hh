@@ -13,25 +13,6 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 
-////////////////////////////////////////////
-// CONSTANTS (please validate with model) //
-////////////////////////////////////////////
-
-#define fov                   1.3962634 // Field of View    TODO
-
-#define ball_hue              32/2      // Orange ball!
-#define color_tolerance       8/2       // +/- color tolerance
-
-#define ball_d                1         // Diameter of the ball (in meters) TODO
-
-#define turn_speed            1.5       // Wheel speed for self-rotation
-#define ball_pixel_threshold  5
-#define image_search_edge     10
-#define DEBUG                 false
-
-////////////////////////////////////////////
-//                                        //
-////////////////////////////////////////////
 
 // Finds the direction of the ball relative to the current angle given
 // the robot's view.
