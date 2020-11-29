@@ -85,7 +85,7 @@ void SearchTask::proceed() {
     return;
   }
 
-  // We hit a wall so we've searched as far as possible.
+  // We hit a soccer_wall so we've searched as far as possible.
   if (MM::is_facing(robot_, direction_, 3) && robot_->range < 1.0) {
     finish();
   }
