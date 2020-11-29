@@ -91,7 +91,7 @@ int TaskTurnTo::poll(Robot* robo) {
         return TSTATUS_DONE;
     }
 
-    float right_speed = 3.5; // left is this times -1.
+    float right_speed = 1.5; // left is this times -1.
 
     // If we're close then slow down.
     if (abs(hdg_off) < ok_thresh * 2) right_speed = 0.7;
@@ -213,9 +213,12 @@ TaskMoveTowards::TaskMoveTowards(Vec2f start_tgt, float vel, float dist) {
 // Absolutely terrible use of a macro.
 void
 calc_target_heading(Vec2f origin, Vec2f tgt, float &dx, float &dy, float &tgt_hdg) {
+//    cout << "a " << origin.x << " "<< origin.y << " " << tgt.x << " " << tgt.y << " "<< tgt_hdg << endl;
     dx = tgt.x - origin.x;
     dy = tgt.y - origin.y;
     tgt_hdg = atan2(dy, dx);
+    
+//    cout << "b " << origin.x << " "<< origin.y << " " << tgt.x << " " << tgt.y << " "<< tgt_hdg << endl;
 }
 
 int TaskMoveTowards::poll_inactive(Robot* robo) {
@@ -258,7 +261,6 @@ int TaskMoveTowards::poll(Robot* robo) {
     // See macro above.
     calc_target_heading(Vec2f(robo->pos_x, robo->pos_y), target_pos, dx, dy, tgt_hdg);
     
-
     // Check if we're cloe enough.
     if (dx * dx + dy * dy < end_dist * end_dist && end_dist > 0) {
         return TSTATUS_DONE;

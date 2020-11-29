@@ -1,0 +1,147 @@
+<?xml version="1.0" ?>
+<%
+  # Based on Gazebo example
+
+  # Vehicle with rigid suspension and front steering
+  # Consists of box chassis with 4 non-steerable wheels
+  # SI units (length in meters)
+
+  # Geometry
+  chassis_dx   = 0.316
+  chassis_dy   = 0.316
+
+  length_edge = 6
+  length_edge_back = 12
+  width_edge = 10
+
+  wall_idx = 0
+  ball_x = rand((-11.0)..(2.0))
+  ball_y = rand((-5.0)..(5.0))
+
+  PI = 3.14159265
+
+  length_div = (-(length_edge_back - 1))..(length_edge - 1)
+  width_div = (-(width_edge - 1))..(width_edge - 1)
+  width_div2 = [-(width_edge - 1)..-4, 4..(width_edge - 1)].flat_map(&:to_a)
+
+%>
+<sdf version="1.5">
+  <!-- http://sdformat.org/spec?elem=sensor&ver=1.5 -->
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+<!--    <include>-->
+<!--      <uri>model://brick_box_3x1x3</uri>-->
+<!--      <name>wall0</name>-->
+<!--      <pose>-22 -18 -2.0 0 0 1.5707963267948966</pose>-->
+<!--    </include>-->
+
+    <!-- The Goal -->
+    <include>
+      <uri>model://checkerboard_plane</uri>
+      <name>goal_1</name>
+      <pose>6 0 0.01 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://checkerboard_plane</uri>
+      <name>goal_2</name>
+      <pose>6 -1.5 0.01 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://checkerboard_plane</uri>
+      <name>goal_3</name>
+      <pose>6 1.5 0.01 0 0 0</pose>
+    </include>
+
+    <%
+      length_div.each do |k|
+      wall_idx = wall_idx + 1
+    %>
+
+    <include>
+      <uri>model://soccer_wall</uri>
+      <%= '<name>soccer_wall_' + wall_idx.to_s + '</name>' %>
+      <pose><%= k %> <%= width_edge %> 0.01 0 0 0</pose>
+    </include>
+
+    <% end %>
+
+    <%
+      length_div.each do |k|
+      wall_idx = wall_idx  + 1
+    %>
+
+    <include>
+      <uri>model://soccer_wall</uri>
+      <%= '<name>soccer_wall_' + wall_idx.to_s + '</name>' %>
+      <pose><%= k %> <%= -width_edge %> 0.01 0 0 0</pose>
+    </include>
+
+    <% end %>
+
+    <%
+      width_div2.each do |k|
+      wall_idx = wall_idx + 1
+    %>
+
+    <include>
+      <uri>model://soccer_wall</uri>
+      <%='<name>soccer_wall_' + wall_idx.to_s + '</name>' %>
+      <pose><%= length_edge %> <%= k %> 0.01 0 0 <%= PI/2 %></pose>
+    </include>
+
+    <% end %>
+
+    <%
+      width_div.each do |k|
+      wall_idx = wall_idx + 1
+    %>
+
+    <include>
+      <uri>model://soccer_wall</uri>
+      <%='<name>soccer_wall_' + wall_idx.to_s + '</name>' %>
+      <pose><%= -length_edge_back %> <%= k %> 0.01 0 0 <%= PI/2 %></pose>
+    </include>
+
+    <% end %>
+
+
+    <include>
+      <uri>model://soccer_ball</uri>
+      <name>soccer_ball</name>
+      <pose> <%=ball_x %> <%=ball_y %> 0 0 0</pose>
+    </include>
+
+    <!-- A testing model that includes the Velodyne sensor model -->
+    <model name="tankbot0">
+      <pose>-5 0 0 0 0 0</pose>
+
+      <include>
+        <uri>model://tankbot_kicker</uri>
+      </include>
+
+      <plugin name="tankbot_control" filename="libtank_control_plugin.so"/>
+    </model>
+
+    <model name="tankbot1">
+      <pose>5 0.5 0 0 0 1.5707963267948966</pose>
+
+      <include>
+        <uri>model://tankbot_goalie</uri>
+      </include>
+
+      <plugin name="tankbot_control" filename="libtank_control_plugin.so"/>
+    </model>
+
+  </world>
+</sdf>
