@@ -42,7 +42,7 @@
     </model>
 
     <model name="tankbot1">
-      <pose>5 0 0 0 0 1.5707963267948966</pose>
+      <pose>5 0.5 0 0 0 1.5707963267948966</pose>
 
       <include>
         <uri>model://tankbot_goalie</uri>
