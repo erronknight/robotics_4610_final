@@ -18,8 +18,8 @@ using namespace std;
 
 aistate *robot_state;
 
-float turn_speed = 3.5;
-float drive_speed = 4.5;
+float turn_speed = 2.5;
+float drive_speed = 3.5;
 
 bool collected = false;
 
@@ -34,7 +34,7 @@ public:
     
     int poll(Robot *robo) override {
         float dist = get_distance_from_ball(robo);
-        if (dist > 0.95) {
+        if (dist > 1) {
             set_default_state(robo);
             
             float angle = get_direction_of_ball(robo) * 50;
