@@ -213,12 +213,12 @@ TaskMoveTowards::TaskMoveTowards(Vec2f start_tgt, float vel, float dist) {
 // Absolutely terrible use of a macro.
 void
 calc_target_heading(Vec2f origin, Vec2f tgt, float &dx, float &dy, float &tgt_hdg) {
-    cout << "a " << origin.x << " "<< origin.y << " " << tgt.x << " " << tgt.y << " "<< tgt_hdg << endl;
+//    cout << "a " << origin.x << " "<< origin.y << " " << tgt.x << " " << tgt.y << " "<< tgt_hdg << endl;
     dx = tgt.x - origin.x;
     dy = tgt.y - origin.y;
     tgt_hdg = atan2(dy, dx);
     
-    cout << "b " << origin.x << " "<< origin.y << " " << tgt.x << " " << tgt.y << " "<< tgt_hdg << endl;
+//    cout << "b " << origin.x << " "<< origin.y << " " << tgt.x << " " << tgt.y << " "<< tgt_hdg << endl;
 }
 
 int TaskMoveTowards::poll_inactive(Robot* robo) {
