@@ -1,12 +1,21 @@
 
-all:
-	(cp ./.idea /other/ 2>/dev/null || :)
-	(cd brain && make)
-	(cd plugins && make)
+BIN := kickerbot goaliebot
+
+THREADS := 4
+
+all: $(BIN)
+
+build/Makefile: Makefile CMakeLists.txt
+	mkdir -p build
+	(cd build && cmake ..)
+
+cmake: build/Makefile
+
+$(BIN): build
+	(cd build && make -j $(THREADS))
+	(cd build && cp $(BIN) ..)
 
 clean:
-	(cp ./.idea /other/ 2>/dev/null || :)
-	(cd brain && make clean)
-	(cd plugins && make clean)
+	rm -rf build $(BIN)
 
-.PHONY: clean
+.PHONY: all cmake clean $(BIN)

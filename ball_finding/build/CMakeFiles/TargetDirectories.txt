@@ -1,3 +1,0 @@
-/home/tkaunzinger/homework/project/robotics_4610_final/ball_finding/build/CMakeFiles/rebuild_cache.dir
-/home/tkaunzinger/homework/project/robotics_4610_final/ball_finding/build/CMakeFiles/edit_cache.dir
-/home/tkaunzinger/homework/project/robotics_4610_final/ball_finding/build/CMakeFiles/ImportTest.dir
