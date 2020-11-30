@@ -22,13 +22,13 @@ private:
     int twist_count = 0;
 
     void strafe(Robot* robot) {
-        static auto strafe_vel = 1;
+        static auto strafe_vel = 4;
         static int tics = 0;
 
         if (tics++ == 0) {
             strafe_vel *= -1;
         }
-        tics %= 1000;
+        tics %= 200;
 
         robot->set_vel(strafe_vel, strafe_vel);
     }
@@ -50,7 +50,7 @@ public:
     bool ball_in_sight = ball_dist > 0 && !isinf(ball_dist);
 
     if (ball_in_sight) {
-        if (ball_dist < 500) {
+        if (ball_dist < 600) {
             robo->set_vel(0, 0);
             return TSTATUS_CONTINUE;
         }
