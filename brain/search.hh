@@ -9,9 +9,11 @@
 #include "robot.hh"
 
 // Imports OpenCV utilities
-#include "opencv2/core/utility.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/imgcodecs.hpp"
+#include <opencv2/core/utility.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+
 
 
 // Finds the direction of the ball relative to the current angle given

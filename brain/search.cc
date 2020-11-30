@@ -8,6 +8,7 @@
 #include "robot.hh"
 #include <iostream>
 
+
 ////////////
 // MACROS //
 ////////////
@@ -29,7 +30,8 @@
 #define turn_speed            3.5       // Wheel speed for self-rotation
 #define ball_pixel_threshold  5
 #define image_search_edge     10
-#define DEBUG                 false
+int search_count = 1;
+bool DEBUG = false;
 
 //////////////////////
 // ADDITIONAL STUBS //
@@ -43,7 +45,7 @@ float _diff(float deg1, float deg2);
 
 // CV helpers
 cv::Mat _make_ball_mask(cv::Mat pic);
-int _get_column_of_ball(cv::Mat pic);
+int _get_column_of_ball(cv::Mat pic, int& row_out, int& col_out );
 int _ball_pixel_height(int column_index, cv::Mat pic);
 float _get_visual_angle(int pixel_height, cv::Mat pic);
 
@@ -63,20 +65,17 @@ float get_direction_of_ball(cv::Mat pic) {
     // Gets a mask of the image filtering the ball
     cv::Mat ball_mask = _make_ball_mask(pic);
     
-    
-    
+    int row_out = 0;
+    int col_out = 0;
     
     // Finds the location of the topmost pixel of the ball (which should also be the center)
-    int column = _get_column_of_ball(ball_mask);
-    
-    if (DEBUG) {
-        cv::imshow("raw", pic);
-        cv::imshow("filter", ball_mask);
-        cv::waitKey(1);
-    }
+    int column = _get_column_of_ball(ball_mask, row_out, col_out);
     
     // Returns a sentinel if the ball is not in frame
     if (column < 0) {
+        cv::imshow("raw", pic);
+        cv::imshow("mask", ball_mask);
+        cv::waitKey(1);
         return 666.0;
     }
 
@@ -84,6 +83,22 @@ float get_direction_of_ball(cv::Mat pic) {
     int pic_width = pic.cols;
     float proportion = static_cast<float>(column - (pic_width / 2.0)) / static_cast<float>(pic_width / 2.0);
     float direction = proportion * (fov / 2.0);
+    
+    if (DEBUG) {
+        for (int i = 0; i < ball_mask.rows; i++) {
+            uchar *ptr = ball_mask.ptr<uchar>(i);
+            ptr[col_out] = 128;
+        }
+    
+        uchar *ptr = ball_mask.ptr<uchar>(row_out);
+        for (int j = 0; j < ball_mask.cols; j++) {
+            ptr[j] = 64;
+        }
+        
+        cv::imshow("raw", pic);
+        cv::imshow("mask", ball_mask);
+        cv::waitKey(1);
+    }
     return direction;
 }
 float get_direction_of_ball(Robot* robot) {
@@ -96,8 +111,10 @@ float get_distance_from_ball(cv::Mat pic) {
     // Gets a mask of the image filtering the ball
     cv::Mat ball_mask = _make_ball_mask(pic);
     
+    int a = 0, b = 0;
+    
     // Finds the location of the topmost pixel of the ball (which should also be the center)
-    int column = _get_column_of_ball(ball_mask);
+    int column = _get_column_of_ball(ball_mask, a, b);
 
     // Returns a sentinel if the ball is not in frame
     if (column < 0) {
@@ -206,7 +223,7 @@ cv::Mat _make_ball_mask(cv::Mat pic) {
 
 // Returns the column within the picture that indersects the middle of the ball.
 // Returns -1 if there is no mask in frame (i.e. all black)
-int _get_column_of_ball(cv::Mat pic) {
+int _get_column_of_ball(cv::Mat pic, int& row_out, int& col_out ) {
     float col_tot = 0;
     float row_tot = 0;
     float count = 0;
@@ -226,20 +243,8 @@ int _get_column_of_ball(cv::Mat pic) {
         }
     }
     
-    int col_out = std::floor(col_tot / count);
-    int row_out = std::floor(row_tot / count);
-    
-    if (DEBUG) {
-        for (int i = 0; i < pic.rows; i++) {
-            uchar *ptr = pic.ptr<uchar>(i);
-            ptr[col_out] = 128;
-        }
-        
-        uchar *ptr = pic.ptr<uchar>(row_out);
-        for (int j = 0; j < pic.cols; j++) {
-            ptr[j] = 64;
-        }
-    }
+    col_out = std::floor(col_tot / count);
+    row_out = std::floor(row_tot / count);
     
     if (count > ball_pixel_threshold) {
         return col_out;

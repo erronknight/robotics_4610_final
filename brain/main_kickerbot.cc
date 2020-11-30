@@ -13,6 +13,12 @@
 #include "search.hh"
 #include <math.h>
 
+#include <opencv2/core/utility.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+
+
 using namespace std;
 
 
@@ -153,6 +159,9 @@ public:
 };
 
 
+int kick_count = 0;
+int freq = 60;
+
 // This is the main task for kickerbot.  I just copied the poll impl from what
 // was in the callback when I got to this part.
 class KickerMainTask : public RoboTask {
@@ -160,9 +169,28 @@ public:
     KickerMainTask() {}
     
     int poll(Robot *robo) override {
+//        kick_count = kick_count + 1;
+//
+//        robo->set_vel(turn_speed, -turn_speed);
+//
+//        if (kick_count < freq) {
+//            robo->set_arm_ang(0.5);
+//        } else if (kick_count < freq * 2) {
+//            robo->set_kick_val(1.0);
+//        } else if (kick_count < freq * 3){
+//            robo->set_kick_val(0);
+//            robo->set_arm_ang(0.05);
+//        }
+//
+//        if (kick_count > freq * 4) {
+//            kick_count = 0;
+//        }
+//        cv::imshow("raw", robo->frame);
+//        cv::waitKey(1);
+
         float shot_length = 5;
         float shot_angle = -35;
-        
+
         if (!collected) {
             robot_state->queue_task(new KickerCollectTask());
         } else {
@@ -171,17 +199,19 @@ public:
             Vec2f goal_location = Vec2f(6.0, 0.0);
             Vec2f destination = goal_location + offset;
             Vec2f shot_spot = goal_location + Vec2f(-1, -0.8);
-            
+
             float tgt_hdg, dx, dy;
             // See macro above.
             calc_target_heading(destination, shot_spot, dx, dy, tgt_hdg);
-            
+
             robot_state->queue_task(new TaskMoveTowards(destination, drive_speed, 0.05));
             robot_state->queue_task(new TaskTurnTo(tgt_hdg));
             robot_state->queue_task(new KickerOpenArmTask(500, true));
             robot_state->queue_task(new KickerShootTask(100, true));
             collected = false;
         }
+        
+
         
         return TSTATUS_CONTINUE;
     }
