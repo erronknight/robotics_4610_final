@@ -9,6 +9,7 @@
 #include "common.hxx"
 #include "tasklib.hxx"
 #include "taskrt.hxx"
+#include "search.hh"
 
 using namespace cv;
 using namespace std;
@@ -27,7 +28,7 @@ private:
         if (tics++ == 0) {
             strafe_vel *= -1;
         }
-        tics %= 300;
+        tics %= 1000;
 
         robot->set_vel(strafe_vel, strafe_vel);
     }
@@ -44,7 +45,18 @@ public:
 
 	twist_count += 1;
 
-    this->strafe(robo);
+    float ball_ang = get_direction_of_ball(robo->frame);
+    float ball_dist = get_distance_from_ball(robo->frame);
+    bool ball_in_sight = ball_dist > 0 && !isinf(ball_dist);
+
+    if (ball_in_sight) {
+        if (ball_dist < 500) {
+            robo->set_vel(0, 0);
+            return TSTATUS_CONTINUE;
+        }
+    } else {
+        this->strafe(robo);
+    }
 
 	if (twist_count < 30) {
 	    robo->set_arm_ang(set_point_left);
