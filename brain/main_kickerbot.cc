@@ -158,6 +158,34 @@ public:
     }
 };
 
+void determine_shot_position(Vec2f robot_pos, float shot_len, Vec2f goal_loc, Vec2f &dest, Vec2f &shot_loc) {
+
+    float angles[3] = {-35, 0, 35};
+    Vec2f shot_offsets[3] = {Vec2f(-1, -0.8), Vec2f(0, -1), Vec2f(1, -0.8)};
+    Vec2f shot_loc_offset = Vec2f(-1, -0.8);
+    float shot_angle;
+
+    Vec2f offset;
+    Vec2f dest_tmp;
+    Vec2f offset_tmp;
+    float tmp_min_dist = 100;
+    for(int i=0; i < 3; i++) {
+        shot_angle = angles[i];
+        offset_tmp = Vec2f(shot_len * cos((180 - shot_angle) * M_PI / 180.0f),
+                         shot_len * sin((180 - shot_angle) * M_PI / 180.0f));
+        dest_tmp = goal_loc + offset;
+        if ((abs(dest_tmp.x - robot_pos.x) + abs(dest_tmp.y - robot_pos.y)) <= tmp_min_dist) {
+            tmp_min_dist = (abs(dest_tmp.x - robot_pos.x) + abs(dest_tmp.y - robot_pos.y));
+            offset = offset_tmp;
+            shot_loc_offset = shot_offsets[i];
+        }
+    }
+
+    // offset = Vec2f(shot_len * cos((180 - shot_angle) * M_PI / 180.0f),
+    //                      shot_len * sin((180 - shot_angle) * M_PI / 180.0f));
+    dest = goal_loc + offset;
+    shot_loc = goal_loc + shot_loc_offset;
+}
 
 int kick_count = 0;
 int freq = 60;
@@ -199,6 +227,8 @@ public:
             Vec2f goal_location = Vec2f(6.0, 0.0);
             Vec2f destination = goal_location + offset;
             Vec2f shot_spot = goal_location + Vec2f(-1, -0.8);
+            
+            determine_shot_position(Vec2f(robo->pos_x, robo->pos_y), shot_length, goal_location, destination, shot_spot);
 
             float tgt_hdg, dx, dy;
             // See macro above.
