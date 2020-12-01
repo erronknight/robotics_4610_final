@@ -39,11 +39,11 @@ public:
         auto jc = model->GetJointController();
         for (auto name : this->drives_l) {
             jc->SetVelocityTarget(name, lvel);
-            std::cerr << "svtl " << name << lvel << std::endl;
+//            std::cerr << "svtl " << name << lvel << std::endl;
         }
         for (auto name : this->drives_r) {
             jc->SetVelocityTarget(name, rvel);
-            std::cerr << "svtr " << name << rvel << std::endl;
+//            std::cerr << "svtr " << name << rvel << std::endl;
         }
     }
 
@@ -52,11 +52,11 @@ public:
         auto jc = model->GetJointController();
         for (auto name : this->drives_arm_r) {
             jc->SetPositionTarget(name, -angle);
-            std::cerr << "spgr " << name << -angle << std::endl;
+//            std::cerr << "spgr " << name << -angle << std::endl;
         }
         for (auto name : this->drives_arm_l) {
             jc->SetPositionTarget(name, angle);
-            std::cerr << "spgl " << name << angle << std::endl;
+//            std::cerr << "spgl " << name << angle << std::endl;
         }
     }
 
@@ -65,7 +65,7 @@ public:
       auto jc = model->GetJointController();
       for (auto name : this->drives_kick) {
         jc->SetPositionTarget(name, pos);
-        std::cerr << "spk " << name << pos << std::endl;
+//        std::cerr << "spk " << name << pos << std::endl;
       }
     }
 
@@ -78,14 +78,14 @@ public:
 
     void
     SetArmPID(string name) {
-        auto pid = common::PID(1.0, 0.1, 1.0);
+        auto pid = common::PID(2.0, 0, 0.0);
         auto jc = model->GetJointController();
         jc->SetPositionPID(name, pid);
     }
 
     void
     SetKickPID(string name) {
-        auto pid = common::PID(25.0, 1.0, 1.0);
+        auto pid = common::PID(1000000.0, 0.0, 0.0);
         auto jc = model->GetJointController();
         jc->SetPositionPID(name, pid);
     }
@@ -179,7 +179,7 @@ public:
         double lvel = 3 * (xx / 25.0);
         double rvel = 3 * (yy / 25.0);
 
-        std::cerr << "Got vel cmd: " << lvel << "," << rvel << std::endl;
+//        std::cerr << "Got vel cmd: " << lvel << "," << rvel << std::endl;
 
         this->SetVel(lvel, rvel);
     }
@@ -188,7 +188,7 @@ public:
     OnArmCmd(ConstAnyPtr &msg) {
         int raw = msg->int_value();
         double rad_angle = float(raw) / 128.0 - 1.0;
-        std::cerr << "Got pos cmd: " << raw << " " << rad_angle << std::endl;
+//        std::cerr << "Got pos cmd: " << raw << " " << rad_angle << std::endl;
         this->SetArmAngle(rad_angle * 3.14159265);
     }
 
@@ -196,7 +196,7 @@ public:
     OnKickCmd(ConstAnyPtr &msg) {
         int raw = msg->int_value();
         double kick_pos = (float(raw) / 256.0) * kicker_length;
-        std::cerr << "Got kick cmd: " << raw << " " << kick_pos << std::endl;
+//        std::cerr << "Got kick cmd: " << raw << " " << kick_pos << std::endl;
         this->SetKickPos(kick_pos);
     }
 

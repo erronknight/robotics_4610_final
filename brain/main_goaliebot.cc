@@ -9,13 +9,30 @@
 #include "common.hxx"
 #include "tasklib.hxx"
 #include "taskrt.hxx"
+#include "search.hh"
 
 using namespace cv;
 using namespace std;
 
-// This is the main task for goaliebot.  There's nothing here yet.
+aistate* robot_state;
+
+// This is the main task for goaliebot.
 class GoalieMainTask : public RoboTask {
+private:
     int twist_count = 0;
+
+    void strafe(Robot* robot) {
+        static auto strafe_vel = 4;
+        static int tics = 0;
+
+        if (tics++ == 0) {
+            strafe_vel *= -1;
+        }
+        tics %= 200;
+
+        robot->set_vel(strafe_vel, strafe_vel);
+    }
+
 public:
     GoalieMainTask() {
     }
@@ -28,6 +45,19 @@ public:
 
 	twist_count += 1;
 
+    float ball_ang = get_direction_of_ball(robo->frame);
+    float ball_dist = get_distance_from_ball(robo->frame);
+    bool ball_in_sight = ball_dist > 0 && !isinf(ball_dist);
+
+    if (ball_in_sight) {
+        if (ball_dist < 600) {
+            robo->set_vel(0, 0);
+            return TSTATUS_CONTINUE;
+        }
+    } else {
+        this->strafe(robo);
+    }
+
 	if (twist_count < 30) {
 	    robo->set_arm_ang(set_point_left);
 	} else {
@@ -38,15 +68,18 @@ public:
 	    twist_count = 0;
 	}
 
+
 	return TSTATUS_CONTINUE;
     }
 
+
+
     std::string name() override {
-	return "GOALIE_MAIN";
+    	return "GOALIE_MAIN";
     }
 };
 
-aistate* robot_state;
+
 
 // Extra delay to make Valgrind more happy while garbage values are cleaned.
 int startup_countdown = 5;

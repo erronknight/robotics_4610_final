@@ -11,9 +11,11 @@ build/Makefile: Makefile CMakeLists.txt
 
 cmake: build/Makefile
 
-$(BIN): $(wildcard *.cc) build/Makefile
+$(BIN): build
 	(cd build && make -j $(THREADS))
 	(cd build && cp $(BIN) ..)
 
 clean:
 	rm -rf build $(BIN)
+
+.PHONY: all cmake clean $(BIN)

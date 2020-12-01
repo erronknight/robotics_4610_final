@@ -5,6 +5,8 @@
 #include "common.hxx"
 #include "pid.hxx"
 
+void calc_target_heading(Vec2f origin, Vec2f tgt, float &dx, float &dy, float &tgt_hdg);
+
 /**
  * Task that just waits some duration and returns.  Useful for traveling some
  * distance in a straight line if you don't need to worry about adjusting.
@@ -60,17 +62,19 @@ public:
 };
 
 class TaskMoveTowards : public RoboTask {
-    Vec2i target_pos;
+    Vec2f target_pos;
     float base_vel;
     float end_dist;
     TaskGo* move_delegate;
 
 public:
     TaskMoveTowards(Vec2i start_tgt, float vel, float dist);
+    TaskMoveTowards(Vec2f start_tgt, float vel, float dist);
     int poll_inactive(Robot* robo) override;
     int poll(Robot* robo) override;
     std::string name() override;
     void update_target(Vec2i new_tgt);
+    void update_target(Vec2f new_tgt);
 };
 
 //class DebugPrintPosTask;

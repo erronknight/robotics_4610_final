@@ -107,25 +107,25 @@ void
 Robot::set_arm_ang(double ang) {
     auto msg = msgs::ConvertAny(int(ang * 128 + 128));
     this->arm_pub->Publish(msg);
-    cout << " send arm " << ang << endl;
+//    cout << " send arm " << ang << endl;
 }
 
 void
 Robot::set_kick_val(double val) {
     auto msg = msgs::ConvertAny(int(val * 256));
     this->kick_pub->Publish(msg);
-    cout << " send kick " << val << endl;
+//    cout << " send kick " << val << endl;
 }
 
 
 void
 Robot::set_vel(double lvel, double rvel)
 {
-    auto r_error = lvel * ((rand() % 21) - 10) * 0.01;
-    auto l_error = rvel * ((rand() % 21) - 10) * 0.01;
-
-    lvel = clamp(-4, lvel + l_error, 4);
-    rvel = clamp(-4, rvel + r_error, 4);
+//    auto r_error = lvel * ((rand() % 21) - 10) * 0.01;
+//    auto l_error = rvel * ((rand() % 21) - 10) * 0.01;
+//
+//    lvel = clamp(-4, lvel + l_error, 4);
+//    rvel = clamp(-4, rvel + r_error, 4);
 
     //cout << "set_vel: " << lvel << "," << rvel << endl;
     int xx = 128 + int(lvel * 25.0);
@@ -166,12 +166,12 @@ Robot::on_frame(ConstImageStampedPtr &msg)
 void
 Robot::on_pose(ConstPoseStampedPtr &msg)
 {
-    auto x_error = ((rand() % 21) - 10) * 0.02;
-    auto y_error = ((rand() % 21) - 10) * 0.02;
+//    auto x_error = ((rand() % 21) - 10) * 0.02;
+//    auto y_error = ((rand() % 21) - 10) * 0.02;
 
     auto pos = msg->pose().position();
-    this->pos_x = pos.x() + x_error;
-    this->pos_y = pos.y() + y_error;
+    this->pos_x = pos.x();// + x_error;
+    this->pos_y = pos.y();// + y_error;
 
     auto rot = msg->pose().orientation();
     ignition::math::Quaternion<double> qrot(rot.w(), rot.x(), rot.y(), rot.z());
